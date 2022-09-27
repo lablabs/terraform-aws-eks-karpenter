@@ -32,6 +32,23 @@ module "eks_node_group" {
   depends_on     = [module.eks_cluster.kubernetes_config_map_id]
 }
 
+resource "aws_iam_role" "this" {
+  name               = "karpenter-node-role"
+  assume_role_policy = data.aws_iam_policy_document.karpenter_node_assume_policy.json
+}
+
+data "aws_iam_policy_document" "karpenter_node_assume_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+    effect = "Allow"
+  }
+}
+
 module "addon_installation_disabled" {
   source = "../../"
 
@@ -39,6 +56,9 @@ module "addon_installation_disabled" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
+  eks_cluster_id                   = module.eks_cluster.eks_cluster_id
+  eks_cluster_endpoint             = module.eks_cluster.eks_cluster_endpoint
+  karpenter_node_role_arn          = aws_iam_role.this.arn
 }
 
 module "addon_installation_helm" {
@@ -50,6 +70,9 @@ module "addon_installation_helm" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
+  eks_cluster_id                   = module.eks_cluster.eks_cluster_id
+  eks_cluster_endpoint             = module.eks_cluster.eks_cluster_endpoint
+  karpenter_node_role_arn          = aws_iam_role.this.arn
 
   values = yamlencode({
     # insert sample values here
@@ -65,6 +88,9 @@ module "addon_installation_argo_kubernetes" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
+  eks_cluster_id                   = module.eks_cluster.eks_cluster_id
+  eks_cluster_endpoint             = module.eks_cluster.eks_cluster_endpoint
+  karpenter_node_role_arn          = aws_iam_role.this.arn
 
   values = yamlencode({
     # insert sample values here
@@ -86,7 +112,9 @@ module "addon_installation_argo_helm" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
-
+  eks_cluster_id                   = module.eks_cluster.eks_cluster_id
+  eks_cluster_endpoint             = module.eks_cluster.eks_cluster_endpoint
+  karpenter_node_role_arn          = aws_iam_role.this.arn
   argo_sync_policy = {
     "automated" : {}
     "syncOptions" = ["CreateNamespace=true"]
