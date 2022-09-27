@@ -1,6 +1,12 @@
 locals {
   values_default = yamlencode({
-    # add default values here
+    "clusterEndpoint" : var.eks_cluster_endpoint
+    "clusterName" : var.eks_cluster_id
+    "serviceAccount" : {
+      "annotations" : {
+        "eks.amazonaws.com/role-arn" : local.irsa_role_create ? aws_iam_role.this[0].arn : ""
+      }
+    }
   })
 }
 

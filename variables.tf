@@ -14,28 +14,42 @@ variable "cluster_identity_oidc_issuer_arn" {
   description = "The OIDC Identity issuer ARN for the cluster that can be used to associate IAM roles with a service account"
 }
 
+variable "eks_cluster_endpoint" {
+  type        = string
+  description = "EKS Cluster Endpoint for the cluster that can be used to join cluster node pool"
+}
+
+variable "eks_cluster_id" {
+  type        = string
+  description = "EKS Cluster ID for the cluster that can be used to join cluster node pool"
+}
+
+variable "karpenter_node_role_arn" {
+  type        = string
+  description = "List of roles arns which can be passed from karpenter service to newly created nodes"
+}
 # ================ common variables (required) ================
 
 variable "helm_chart_name" {
   type        = string
-  default     = "<$addon-name>"
+  default     = "karpenter"
   description = "Helm chart name to be installed"
 }
 
 variable "helm_chart_version" {
   type        = string
-  default     = "<helm_chart_version>"
+  default     = "0.16.2"
   description = "Version of the Helm chart"
 }
 
 variable "helm_release_name" {
   type        = string
-  default     = "<$addon-name>"
+  default     = "karpenter"
   description = "Helm release name"
 }
 variable "helm_repo_url" {
   type        = string
-  default     = "<helm_repo_url>"
+  default     = "https://charts.karpenter.sh"
   description = "Helm repository"
 }
 
@@ -47,20 +61,20 @@ variable "helm_create_namespace" {
 
 variable "namespace" {
   type        = string
-  default     = "<$addon-name>"
-  description = "The K8s namespace in which the <$addon-name> service account has been created"
+  default     = "karpenter"
+  description = "The K8s namespace in which the karpenter service account has been created"
 }
 
 variable "settings" {
   type        = map(any)
   default     = {}
-  description = "Additional helm sets which will be passed to the Helm chart values, see https://hub.helm.sh/charts/stable/<$addon-name>"
+  description = "Additional helm sets which will be passed to the Helm chart values, see https://hub.helm.sh/charts/stable/karpenter"
 }
 
 variable "values" {
   type        = string
   default     = ""
-  description = "Additional yaml encoded values which will be passed to the Helm chart, see https://hub.helm.sh/charts/stable/<$addon-name>"
+  description = "Additional yaml encoded values which will be passed to the Helm chart, see https://hub.helm.sh/charts/stable/karpenter"
 }
 
 # ================ IRSA variables (optional) ================
@@ -109,8 +123,8 @@ variable "irsa_additional_policies" {
 
 variable "irsa_role_name_prefix" {
   type        = string
-  default     = "<$addon-name>-irsa"
-  description = "The IRSA role name prefix for <$addon-name>"
+  default     = "karpenter-irsa"
+  description = "The IRSA role name prefix for karpenter"
 }
 
 variable "irsa_tags" {
@@ -121,8 +135,8 @@ variable "irsa_tags" {
 
 variable "service_account_name" {
   type        = string
-  default     = "<$addon-name>"
-  description = "The k8s <$addon-name> service account name"
+  default     = "karpenter"
+  description = "The k8s karpenter service account name"
 }
 
 # ================ argo variables (required) ================

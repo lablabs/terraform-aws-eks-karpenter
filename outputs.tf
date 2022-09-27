@@ -13,7 +13,7 @@ output "kubernetes_application_attributes" {
   value       = try(kubernetes_manifest.this, {})
 }
 
-output "iam_role_attributes" {
-  description = "<$addon-name> IAM role atributes"
+output "iam_irsa_role_attributes" {
+  description = "karpenter IAM role atributes"
   value       = try(aws_iam_role.this[0], {})
 }
