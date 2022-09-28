@@ -53,10 +53,8 @@ data "aws_iam_policy_document" "this" {
     actions = [
       "iam:PassRole"
     ]
-    resources = [
-      var.karpenter_node_role_arns[0]
-    ]
-    effect = "Allow"
+    resources = var.karpenter_node_role_arns
+    effect    = "Allow"
   }
 }
 
