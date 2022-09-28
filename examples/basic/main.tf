@@ -56,9 +56,8 @@ module "addon_installation_disabled" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
-  eks_cluster_id                   = module.eks_cluster.eks_cluster_id
-  eks_cluster_endpoint             = module.eks_cluster.eks_cluster_endpoint
-  karpenter_node_role_arn          = aws_iam_role.this.arn
+  cluster_name                     = module.eks_cluster.eks_cluster_id
+  karpenter_node_role_arns         = aws_iam_role.this.arn
 }
 
 module "addon_installation_helm" {
@@ -70,9 +69,8 @@ module "addon_installation_helm" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
-  eks_cluster_id                   = module.eks_cluster.eks_cluster_id
-  eks_cluster_endpoint             = module.eks_cluster.eks_cluster_endpoint
-  karpenter_node_role_arn          = aws_iam_role.this.arn
+  cluster_name                     = module.eks_cluster.eks_cluster_id
+  karpenter_node_role_arns         = aws_iam_role.this.arn
 
   values = yamlencode({
     # insert sample values here
@@ -88,9 +86,8 @@ module "addon_installation_argo_kubernetes" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
-  eks_cluster_id                   = module.eks_cluster.eks_cluster_id
-  eks_cluster_endpoint             = module.eks_cluster.eks_cluster_endpoint
-  karpenter_node_role_arn          = aws_iam_role.this.arn
+  cluster_name                     = module.eks_cluster.eks_cluster_id
+  karpenter_node_role_arns         = aws_iam_role.this.arn
 
   values = yamlencode({
     # insert sample values here
@@ -112,9 +109,8 @@ module "addon_installation_argo_helm" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
-  eks_cluster_id                   = module.eks_cluster.eks_cluster_id
-  eks_cluster_endpoint             = module.eks_cluster.eks_cluster_endpoint
-  karpenter_node_role_arn          = aws_iam_role.this.arn
+  cluster_name                     = module.eks_cluster.eks_cluster_id
+  karpenter_node_role_arns         = aws_iam_role.this.arn
   argo_sync_policy = {
     "automated" : {}
     "syncOptions" = ["CreateNamespace=true"]

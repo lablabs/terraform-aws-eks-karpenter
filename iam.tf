@@ -6,40 +6,55 @@ data "aws_iam_policy_document" "this" {
   count = local.irsa_role_create && var.irsa_policy_enabled && !var.irsa_assume_role_enabled ? 1 : 0
 
   statement {
-    sid = "NodeResourceCreation"
+    sid = "NodeResourceCreation" #checkov:skip=CKV_AWS_111:In the future, we may further lock down ec2:RunInstances by using tags in related resources.
     actions = [
-      # Write Operations
       "ec2:CreateLaunchTemplate",
       "ec2:CreateFleet",
-      "ec2:RunInstances",
       "ec2:CreateTags",
-      "ec2:TerminateInstances",
-      "ec2:DeleteLaunchTemplate",
-      # Read Operations
       "ec2:DescribeLaunchTemplates",
+      "ec2:DescribeImages",
       "ec2:DescribeInstances",
       "ec2:DescribeSecurityGroups",
       "ec2:DescribeSubnets",
-      "ec2:DescribeImages",
       "ec2:DescribeInstanceTypes",
       "ec2:DescribeInstanceTypeOfferings",
       "ec2:DescribeAvailabilityZones",
       "ec2:DescribeSpotPriceHistory",
-      "ssm:GetParameter",
-      "pricing:GetProducts"
+      "pricing:GetProducts",
+      "ec2:RunInstances"
     ]
-    resources = [ #checkov:skip=CKV_AWS_111
-      "*"         #checkov:skip=CKV_AWS_108
-    ]
-    effect = "Allow"
+    resources = ["*"]
   }
+
+  statement {
+    sid = "NodeResourceDeletion"
+    actions = [
+      "ec2:TerminateInstances",
+      "ec2:DeleteLaunchTemplate",
+    ]
+
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:ResourceTag/kubernetes.io/cluster/${var.cluster_name}"
+      values   = ["owned"]
+    }
+  }
+
+  statement {
+    sid       = "GetParameters"
+    actions   = ["ssm:GetParameter"]
+    resources = ["arn:aws:ssm:*:*:parameter/aws/service/*"]
+  }
+
   statement {
     sid = "PassRole"
     actions = [
       "iam:PassRole"
     ]
     resources = [
-      var.karpenter_node_role_arn
+      var.karpenter_node_role_arns[0]
     ]
     effect = "Allow"
   }

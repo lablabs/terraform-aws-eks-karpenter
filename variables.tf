@@ -14,18 +14,14 @@ variable "cluster_identity_oidc_issuer_arn" {
   description = "The OIDC Identity issuer ARN for the cluster that can be used to associate IAM roles with a service account"
 }
 
-variable "eks_cluster_endpoint" {
-  type        = string
-  description = "EKS Cluster Endpoint for the cluster that can be used to join cluster node pool"
-}
-
-variable "eks_cluster_id" {
+variable "cluster_name" {
   type        = string
   description = "EKS Cluster ID for the cluster that can be used to join cluster node pool"
 }
 
-variable "karpenter_node_role_arn" {
-  type        = string
+variable "karpenter_node_role_arns" {
+  type        = list(any)
+  default     = ["*"]
   description = "List of roles arns which can be passed from karpenter service to newly created nodes"
 }
 # ================ common variables (required) ================
@@ -68,13 +64,13 @@ variable "namespace" {
 variable "settings" {
   type        = map(any)
   default     = {}
-  description = "Additional helm sets which will be passed to the Helm chart values, see https://hub.helm.sh/charts/stable/karpenter"
+  description = "Additional helm sets which will be passed to the Helm chart values, see https://artifacthub.io/packages/helm/karpenter/karpenter "
 }
 
 variable "values" {
   type        = string
   default     = ""
-  description = "Additional yaml encoded values which will be passed to the Helm chart, see https://hub.helm.sh/charts/stable/karpenter"
+  description = "Additional yaml encoded values which will be passed to the Helm chart, see https://artifacthub.io/packages/helm/karpenter/karpenter "
 }
 
 # ================ IRSA variables (optional) ================
