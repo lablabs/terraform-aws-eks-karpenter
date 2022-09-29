@@ -30,18 +30,29 @@ data "aws_iam_policy_document" "this" {
     sid = "NodeResourceDeletion"
     actions = [
       "ec2:TerminateInstances",
-      "ec2:DeleteLaunchTemplate",
     ]
 
     resources = ["*"]
 
     condition {
       test     = "StringEquals"
-      variable = "ec2:ResourceTag/karpenter.k8s.aws/cluster/${var.cluster_name}"
+      variable = "ec2:ResourceTag/kubernetes.io/cluster/${var.cluster_name}"
       values   = ["owned"]
     }
   }
+  statement {
+    sid = "KarpenterResourceDeletion"
+    actions = [
+      "ec2:DeleteLaunchTemplate",
+    ]
 
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:ResourceTag/karpenter.k8s.aws/cluster"
+      values   = [var.cluster_name]
+    }
+  }
   statement {
     sid       = "GetParameters"
     actions   = ["ssm:GetParameter"]
