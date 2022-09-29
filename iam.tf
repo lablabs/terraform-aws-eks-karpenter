@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "this" {
 
     condition {
       test     = "StringEquals"
-      variable = "ec2:ResourceTag/kubernetes.io/cluster/${var.cluster_name}"
+      variable = "ec2:ResourceTag/karpenter.k8s.aws/cluster/${var.cluster_name}"
       values   = ["owned"]
     }
   }
