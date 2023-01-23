@@ -5,7 +5,7 @@ resource "helm_release" "this" {
   namespace        = var.namespace
   name             = var.helm_release_name
   version          = var.helm_chart_version
-  repository       = var.helm_repo_url
+  repository       = var.helm_repo_oci ? "oci://${local.helm_repo_url}" : "https://${local.helm_repo_url}"
 
   repository_key_file        = var.helm_repo_key_file
   repository_cert_file       = var.helm_repo_cert_file

@@ -7,7 +7,7 @@ locals {
   argo_application_values = {
     "project" : var.argo_project
     "source" : {
-      "repoURL" : var.helm_repo_url
+      "repoURL" : var.helm_repo_oci ? local.helm_repo_url : "https://${local.helm_repo_url}"
       "chart" : var.helm_chart_name
       "targetRevision" : var.helm_chart_version
       "helm" : {

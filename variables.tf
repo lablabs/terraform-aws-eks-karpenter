@@ -34,7 +34,7 @@ variable "helm_chart_name" {
 
 variable "helm_chart_version" {
   type        = string
-  default     = "0.16.2"
+  default     = "0.20.0"
   description = "Version of the Helm chart"
 }
 
@@ -45,8 +45,14 @@ variable "helm_release_name" {
 }
 variable "helm_repo_url" {
   type        = string
-  default     = "https://charts.karpenter.sh"
+  default     = "public.ecr.aws"
   description = "Helm repository"
+}
+
+variable "helm_repo_oci" {
+  type        = bool
+  default     = false
+  description = "Whether repo is OCI compatible"
 }
 
 variable "helm_create_namespace" {
