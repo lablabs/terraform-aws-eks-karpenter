@@ -51,7 +51,7 @@ variable "helm_repo_url" {
 
 variable "helm_repo_oci" {
   type        = bool
-  default     = false
+  default     = true
   description = "Whether repo is OCI compatible"
 }
 

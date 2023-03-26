@@ -166,7 +166,7 @@ No modules.
 | <a name="input_helm_repo_ca_file"></a> [helm\_repo\_ca\_file](#input\_helm\_repo\_ca\_file) | Helm repositories cert file | `string` | `""` | no |
 | <a name="input_helm_repo_cert_file"></a> [helm\_repo\_cert\_file](#input\_helm\_repo\_cert\_file) | Helm repositories cert file | `string` | `""` | no |
 | <a name="input_helm_repo_key_file"></a> [helm\_repo\_key\_file](#input\_helm\_repo\_key\_file) | Helm repositories cert key file | `string` | `""` | no |
-| <a name="input_helm_repo_oci"></a> [helm\_repo\_oci](#input\_helm\_repo\_oci) | Whether repo is OCI compatible | `bool` | `false` | no |
+| <a name="input_helm_repo_oci"></a> [helm\_repo\_oci](#input\_helm\_repo\_oci) | Whether repo is OCI compatible | `bool` | `true` | no |
 | <a name="input_helm_repo_password"></a> [helm\_repo\_password](#input\_helm\_repo\_password) | Password for HTTP basic authentication against the helm repository | `string` | `""` | no |
 | <a name="input_helm_repo_url"></a> [helm\_repo\_url](#input\_helm\_repo\_url) | Helm repository | `string` | `"public.ecr.aws"` | no |
 | <a name="input_helm_repo_username"></a> [helm\_repo\_username](#input\_helm\_repo\_username) | Username for HTTP basic authentication against the helm repository | `string` | `""` | no |
