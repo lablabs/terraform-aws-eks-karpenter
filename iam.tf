@@ -67,6 +67,20 @@ data "aws_iam_policy_document" "this" {
     resources = var.karpenter_node_role_arns
     effect    = "Allow"
   }
+  dynamic "statement" {
+    for_each = var.enabled ? [0] : []
+
+    content {
+      sid = "HandleInteruptionsQueueMessages"
+      actions = [
+        "sqs:DeleteMessage",
+        "sqs:GetQueueUrl",
+        "sqs:GetQueueAttributes",
+        "sqs:ReceiveMessage",
+      ]
+      resources = [aws_sqs_queue.this[0].arn]
+    }
+  }
 }
 
 data "aws_iam_policy_document" "this_assume" {

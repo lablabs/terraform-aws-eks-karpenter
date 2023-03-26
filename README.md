@@ -44,6 +44,39 @@ To disable of creation IRSA role and IRSA policy, set `irsa_role_create = false`
 ### Role assuming
 To assume role set `irsa_assume_role_enabled = true` and specify `irsa_assume_role_arn` variable -->
 
+## Repository configuration
+
+In variable `helm_repo_oci` you can switch between OCI and non-OCI repositories types. Due to non standardized input of repository format between argocd and helm you must use correct url format for each type.
+
+For helm_repo_oci=`true` in variable `helm_repo_url` use format without protocol prefix `public.ecr.aws` . If you put there `https` prefix it will be stripped automatically as fails safe mechanism .
+
+For helm_repo_oci=`false`  in variable `helm_repo_url` use format including protocol prefix like `https://chartmuseum.example.com`
+
+## Spot interruption testing
+
+To test whether karpenter integration with SQS is working properly you can send Spot interruption Warning message to SQS queue.
+For more information about correct time format etc. check the documentation linked below.
+
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-instance-termination-notices.html#ec2-spot-instance-interruption-warning-event
+
+
+```json
+{
+    "version": "0",
+    "id": "12345678-1234-1234-1234-123456789012",
+    "detail-type": "EC2 Spot Instance Interruption Warning",
+    "source": "aws.ec2",
+    "account": "123456789012",
+    "time": "2023-03-26T22:22:33+02:00",
+    "region": "eu-central-1",
+    "resources": ["arn:aws:ec2:eu-central-1:123456789012:instance/i-00c05af08b38bb912"],
+    "detail": {
+        "instance-id": "i-00c05af08b38bb912",
+        "instance-action": "action"
+    }
+}
+```
+
 ## Examples
 
 See [Basic example](examples/basic/README.md) for further information.
@@ -67,17 +100,23 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [aws_cloudwatch_event_rule.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
+| [aws_cloudwatch_event_target.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
 | [aws_iam_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.this_additional](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_sqs_queue.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue) | resource |
+| [aws_sqs_queue_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue_policy) | resource |
 | [helm_release.argo_application](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.this](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubernetes_manifest.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
 | [aws_eks_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster) | data source |
+| [aws_iam_policy_document.queue](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.this_assume](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.this_irsa](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 | [utils_deep_merge_yaml.argo_helm_values](https://registry.terraform.io/providers/cloudposse/utils/latest/docs/data-sources/deep_merge_yaml) | data source |
 | [utils_deep_merge_yaml.values](https://registry.terraform.io/providers/cloudposse/utils/latest/docs/data-sources/deep_merge_yaml) | data source |
 
@@ -106,7 +145,7 @@ No modules.
 | <a name="input_enabled"></a> [enabled](#input\_enabled) | Variable indicating whether deployment is enabled | `bool` | `true` | no |
 | <a name="input_helm_atomic"></a> [helm\_atomic](#input\_helm\_atomic) | If set, installation process purges chart on fail. The wait flag will be set automatically if atomic is used | `bool` | `false` | no |
 | <a name="input_helm_chart_name"></a> [helm\_chart\_name](#input\_helm\_chart\_name) | Helm chart name to be installed | `string` | `"karpenter"` | no |
-| <a name="input_helm_chart_version"></a> [helm\_chart\_version](#input\_helm\_chart\_version) | Version of the Helm chart | `string` | `"0.16.2"` | no |
+| <a name="input_helm_chart_version"></a> [helm\_chart\_version](#input\_helm\_chart\_version) | Version of the Helm chart | `string` | `"0.20.0"` | no |
 | <a name="input_helm_cleanup_on_fail"></a> [helm\_cleanup\_on\_fail](#input\_helm\_cleanup\_on\_fail) | Allow deletion of new resources created in this helm upgrade when upgrade fails | `bool` | `false` | no |
 | <a name="input_helm_create_namespace"></a> [helm\_create\_namespace](#input\_helm\_create\_namespace) | Create the namespace if it does not yet exist | `bool` | `true` | no |
 | <a name="input_helm_dependency_update"></a> [helm\_dependency\_update](#input\_helm\_dependency\_update) | Runs helm dependency update before installing the chart | `bool` | `false` | no |
@@ -127,8 +166,9 @@ No modules.
 | <a name="input_helm_repo_ca_file"></a> [helm\_repo\_ca\_file](#input\_helm\_repo\_ca\_file) | Helm repositories cert file | `string` | `""` | no |
 | <a name="input_helm_repo_cert_file"></a> [helm\_repo\_cert\_file](#input\_helm\_repo\_cert\_file) | Helm repositories cert file | `string` | `""` | no |
 | <a name="input_helm_repo_key_file"></a> [helm\_repo\_key\_file](#input\_helm\_repo\_key\_file) | Helm repositories cert key file | `string` | `""` | no |
+| <a name="input_helm_repo_oci"></a> [helm\_repo\_oci](#input\_helm\_repo\_oci) | Whether repo is OCI compatible | `bool` | `false` | no |
 | <a name="input_helm_repo_password"></a> [helm\_repo\_password](#input\_helm\_repo\_password) | Password for HTTP basic authentication against the helm repository | `string` | `""` | no |
-| <a name="input_helm_repo_url"></a> [helm\_repo\_url](#input\_helm\_repo\_url) | Helm repository | `string` | `"https://charts.karpenter.sh"` | no |
+| <a name="input_helm_repo_url"></a> [helm\_repo\_url](#input\_helm\_repo\_url) | Helm repository | `string` | `"public.ecr.aws"` | no |
 | <a name="input_helm_repo_username"></a> [helm\_repo\_username](#input\_helm\_repo\_username) | Username for HTTP basic authentication against the helm repository | `string` | `""` | no |
 | <a name="input_helm_reset_values"></a> [helm\_reset\_values](#input\_helm\_reset\_values) | When upgrading, reset the values to the ones built into the helm chart | `bool` | `false` | no |
 | <a name="input_helm_reuse_values"></a> [helm\_reuse\_values](#input\_helm\_reuse\_values) | When upgrading, reuse the last helm release's values and merge in any overrides. If 'helm\_reset\_values' is specified, this is ignored | `bool` | `false` | no |
@@ -146,7 +186,9 @@ No modules.
 | <a name="input_irsa_tags"></a> [irsa\_tags](#input\_irsa\_tags) | IRSA resources tags | `map(string)` | `{}` | no |
 | <a name="input_karpenter_node_role_arns"></a> [karpenter\_node\_role\_arns](#input\_karpenter\_node\_role\_arns) | List of roles arns which can be passed from karpenter service to newly created nodes | `list(any)` | <pre>[<br>  "*"<br>]</pre> | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The K8s namespace in which the karpenter service account has been created | `string` | `"karpenter"` | no |
+| <a name="input_queue_interruption_prefix"></a> [queue\_interruption\_prefix](#input\_queue\_interruption\_prefix) | Custom prefix for karpenter spot interruption queue | `string` | `"interruption-queue"` | no |
 | <a name="input_rbac_create"></a> [rbac\_create](#input\_rbac\_create) | Whether to create and use RBAC resources | `bool` | `true` | no |
+| <a name="input_rule_name_prefix"></a> [rule\_name\_prefix](#input\_rule\_name\_prefix) | Prefix used for all event bridge rules | `string` | `"Karpenter"` | no |
 | <a name="input_service_account_create"></a> [service\_account\_create](#input\_service\_account\_create) | Whether to create Service Account | `bool` | `true` | no |
 | <a name="input_service_account_name"></a> [service\_account\_name](#input\_service\_account\_name) | The k8s karpenter service account name | `string` | `"karpenter"` | no |
 | <a name="input_settings"></a> [settings](#input\_settings) | Additional helm sets which will be passed to the Helm chart values, see https://artifacthub.io/packages/helm/karpenter/karpenter | `map(any)` | `{}` | no |

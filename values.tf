@@ -6,6 +6,7 @@ locals {
       "aws" : {
         "clusterEndpoint" : data.aws_eks_cluster.this.endpoint
         "clusterName" : var.cluster_name
+        "interruptionQueueName" : aws_sqs_queue.this[0].name
       }
     }
     "serviceAccount" : {

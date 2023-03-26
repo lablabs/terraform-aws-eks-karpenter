@@ -414,3 +414,17 @@ variable "helm_postrender" {
   default     = {}
   description = "Value block with a path to a binary file to run after helm renders the manifest which can alter the manifest contents"
 }
+
+# ================ spot interuption handling  (required) ================
+
+variable "queue_interruption_prefix" {
+  type        = string
+  default     = "interruption-queue"
+  description = "Custom prefix for karpenter spot interruption queue"
+}
+
+variable "rule_name_prefix" {
+  description = "Prefix used for all event bridge rules"
+  type        = string
+  default     = "Karpenter"
+}
