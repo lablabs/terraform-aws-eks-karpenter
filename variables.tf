@@ -34,7 +34,7 @@ variable "helm_chart_name" {
 
 variable "helm_chart_version" {
   type        = string
-  default     = "0.16.2"
+  default     = "0.20.0"
   description = "Version of the Helm chart"
 }
 
@@ -45,8 +45,14 @@ variable "helm_release_name" {
 }
 variable "helm_repo_url" {
   type        = string
-  default     = "https://charts.karpenter.sh"
+  default     = "public.ecr.aws"
   description = "Helm repository"
+}
+
+variable "helm_repo_oci" {
+  type        = bool
+  default     = true
+  description = "Whether repo is OCI compatible"
 }
 
 variable "helm_create_namespace" {
@@ -407,4 +413,18 @@ variable "helm_postrender" {
   type        = map(any)
   default     = {}
   description = "Value block with a path to a binary file to run after helm renders the manifest which can alter the manifest contents"
+}
+
+# ================ spot interuption handling  (required) ================
+
+variable "queue_interruption_prefix" {
+  type        = string
+  default     = "interruption-queue"
+  description = "Custom prefix for karpenter spot interruption queue"
+}
+
+variable "rule_interruption_prefix" {
+  description = "Prefix used for all event bridge rules"
+  type        = string
+  default     = "Karpenter"
 }

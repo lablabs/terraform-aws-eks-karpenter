@@ -1,7 +1,14 @@
 locals {
+  helm_repo_url = trimprefix(var.helm_repo_url, "https://")
+
   values_default = yamlencode({
-    "clusterEndpoint" : data.aws_eks_cluster.this.endpoint
-    "clusterName" : var.cluster_name
+    "settings" : {
+      "aws" : {
+        "clusterEndpoint" : data.aws_eks_cluster.this.endpoint
+        "clusterName" : var.cluster_name
+        "interruptionQueueName" : aws_sqs_queue.this[0].name
+      }
+    }
     "serviceAccount" : {
       "annotations" : {
         "eks.amazonaws.com/role-arn" : local.irsa_role_create ? aws_iam_role.this[0].arn : ""
