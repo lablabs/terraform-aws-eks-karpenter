@@ -423,7 +423,7 @@ variable "queue_interruption_prefix" {
   description = "Custom prefix for karpenter spot interruption queue"
 }
 
-variable "rule_name_prefix" {
+variable "rule_interruption_prefix" {
   description = "Prefix used for all event bridge rules"
   type        = string
   default     = "Karpenter"

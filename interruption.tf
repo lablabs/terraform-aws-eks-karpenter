@@ -1,5 +1,5 @@
 locals {
-  dns_suffix = data.aws_partition.current.dns_suffix
+  aws_partition_dns_suffix = data.aws_partition.current.dns_suffix
 }
 
 data "aws_partition" "current" {}
@@ -23,8 +23,8 @@ data "aws_iam_policy_document" "queue" {
     principals {
       type = "Service"
       identifiers = [
-        "events.${local.dns_suffix}",
-        "sqs.${local.dns_suffix}",
+        "events.${local.aws_partition_dns_suffix}",
+        "sqs.${local.aws_partition_dns_suffix}",
       ]
     }
 
@@ -82,7 +82,7 @@ locals {
 resource "aws_cloudwatch_event_rule" "this" {
   for_each = { for k, v in local.events : k => v if var.enabled }
 
-  name_prefix   = "${var.rule_name_prefix}${each.value.name}-"
+  name_prefix   = "${var.rule_interruption_prefix}${each.value.name}-"
   description   = each.value.description
   event_pattern = jsonencode(each.value.event_pattern)
 

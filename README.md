@@ -188,7 +188,7 @@ No modules.
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | The K8s namespace in which the karpenter service account has been created | `string` | `"karpenter"` | no |
 | <a name="input_queue_interruption_prefix"></a> [queue\_interruption\_prefix](#input\_queue\_interruption\_prefix) | Custom prefix for karpenter spot interruption queue | `string` | `"interruption-queue"` | no |
 | <a name="input_rbac_create"></a> [rbac\_create](#input\_rbac\_create) | Whether to create and use RBAC resources | `bool` | `true` | no |
-| <a name="input_rule_name_prefix"></a> [rule\_name\_prefix](#input\_rule\_name\_prefix) | Prefix used for all event bridge rules | `string` | `"Karpenter"` | no |
+| <a name="input_rule_interruption_prefix"></a> [rule\_interruption\_prefix](#input\_rule\_interruption\_prefix) | Prefix used for all event bridge rules | `string` | `"Karpenter"` | no |
 | <a name="input_service_account_create"></a> [service\_account\_create](#input\_service\_account\_create) | Whether to create Service Account | `bool` | `true` | no |
 | <a name="input_service_account_name"></a> [service\_account\_name](#input\_service\_account\_name) | The k8s karpenter service account name | `string` | `"karpenter"` | no |
 | <a name="input_settings"></a> [settings](#input\_settings) | Additional helm sets which will be passed to the Helm chart values, see https://artifacthub.io/packages/helm/karpenter/karpenter | `map(any)` | `{}` | no |
