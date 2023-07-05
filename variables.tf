@@ -100,6 +100,12 @@ variable "service_account_create" {
   description = "Whether to create Service Account"
 }
 
+variable "service_account_name" {
+  type        = string
+  default     = "karpenter"
+  description = "The k8s <$addon-name> service account name"
+}
+
 variable "irsa_role_create" {
   type        = bool
   default     = true
@@ -140,12 +146,6 @@ variable "irsa_tags" {
   type        = map(string)
   default     = {}
   description = "IRSA resources tags"
-}
-
-variable "service_account_name" {
-  type        = string
-  default     = "karpenter"
-  description = "The k8s karpenter service account name"
 }
 
 # ================ argo variables (required) ================
