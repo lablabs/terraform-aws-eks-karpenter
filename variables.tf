@@ -24,6 +24,13 @@ variable "karpenter_node_role_arns" {
   default     = ["*"]
   description = "List of roles arns which can be passed from karpenter service to newly created nodes"
 }
+
+variable "aws_partition" {
+  type        = string
+  default     = "aws"
+  description = "AWS partition in which the resources are located. Avaliable values are `aws`, `aws-cn`, `aws-us-gov`"
+}
+
 # ================ common variables (required) ================
 
 variable "helm_chart_name" {
