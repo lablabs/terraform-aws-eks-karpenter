@@ -2,11 +2,17 @@ locals {
   irsa_role_create = var.enabled && var.rbac_create && var.service_account_create && var.irsa_role_create
 }
 
+data "aws_region" "this" {}
+
+data "aws_caller_identity" "this" {}
+
 data "aws_iam_policy_document" "this" {
   count = local.irsa_role_create && var.irsa_policy_enabled && !var.irsa_assume_role_enabled ? 1 : 0
 
+  #checkov:skip=CKV_AWS_111:In the future, we may further lock down ec2:RunInstances by using tags in related resources.
+  #checkov:skip=CKV_AWS_356: Describe need to be allowed on all resources
   statement {
-    sid = "NodeResourceCreation" #checkov:skip=CKV_AWS_111:In the future, we may further lock down ec2:RunInstances by using tags in related resources.
+    sid = "NodeResourceCreation"
     actions = [
       "ec2:CreateLaunchTemplate",
       "ec2:CreateFleet",
@@ -67,6 +73,16 @@ data "aws_iam_policy_document" "this" {
     resources = var.karpenter_node_role_arns
     effect    = "Allow"
   }
+
+  statement {
+    sid = "EKSClusterEndpointLookup"
+    actions = [
+      "eks:DescribeCluster"
+    ]
+    resources = ["arn:${var.aws_partition}:eks:${data.aws_region.this.name}:${data.aws_caller_identity.this.id}:cluster/${var.cluster_name}"]
+    effect    = "Allow"
+  }
+
   dynamic "statement" {
     for_each = var.enabled ? [0] : []
 

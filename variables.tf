@@ -24,6 +24,13 @@ variable "karpenter_node_role_arns" {
   default     = ["*"]
   description = "List of roles arns which can be passed from karpenter service to newly created nodes"
 }
+
+variable "aws_partition" {
+  type        = string
+  default     = "aws"
+  description = "AWS partition in which the resources are located. Avaliable values are `aws`, `aws-cn`, `aws-us-gov`"
+}
+
 # ================ common variables (required) ================
 
 variable "helm_chart_name" {
@@ -34,7 +41,7 @@ variable "helm_chart_name" {
 
 variable "helm_chart_version" {
   type        = string
-  default     = "0.20.0"
+  default     = "0.28.0"
   description = "Version of the Helm chart"
 }
 
@@ -43,6 +50,7 @@ variable "helm_release_name" {
   default     = "karpenter"
   description = "Helm release name"
 }
+
 variable "helm_repo_url" {
   type        = string
   default     = "public.ecr.aws"
@@ -93,6 +101,12 @@ variable "service_account_create" {
   description = "Whether to create Service Account"
 }
 
+variable "service_account_name" {
+  type        = string
+  default     = "karpenter"
+  description = "The k8s <$addon-name> service account name"
+}
+
 variable "irsa_role_create" {
   type        = bool
   default     = true
@@ -135,12 +149,6 @@ variable "irsa_tags" {
   description = "IRSA resources tags"
 }
 
-variable "service_account_name" {
-  type        = string
-  default     = "karpenter"
-  description = "The k8s karpenter service account name"
-}
-
 # ================ argo variables (required) ================
 
 variable "argo_namespace" {
@@ -159,6 +167,18 @@ variable "argo_helm_enabled" {
   type        = bool
   default     = false
   description = "If set to true, the ArgoCD Application manifest will be deployed using Kubernetes provider as a Helm release. Otherwise it'll be deployed as a Kubernetes manifest. See Readme for more info"
+}
+
+variable "argo_helm_wait_timeout" {
+  type        = string
+  default     = "10m"
+  description = "Timeout for ArgoCD Application Helm release wait job"
+}
+
+variable "argo_helm_wait_backoff_limit" {
+  type        = number
+  default     = 6
+  description = "Backoff limit for ArgoCD Application Helm release wait job"
 }
 
 variable "argo_destination_server" {
@@ -223,7 +243,7 @@ variable "argo_helm_values" {
 
 variable "argo_kubernetes_manifest_computed_fields" {
   type        = list(string)
-  default     = ["metadata.labels", "metadata.annotations"]
+  default     = ["metadata.labels", "metadata.annotations", "metadata.finalizers"]
   description = "List of paths of fields to be handled as \"computed\". The user-configured value for the field will be overridden by any different value returned by the API after apply."
 }
 
