@@ -1,8 +1,8 @@
 # AWS EKS Karpenter Terraform module
 
-[![labyrinth labs logo](ll-logo.png)](https://lablabs.io/)
+[<img src="https://lablabs.io/static/ll-logo.png" width=350px>](https://lablabs.io/)
 
-We help companies build, run, deploy and scale software and infrastructure by embracing the right technologies and principles. Check out our website at <https://lablabs.io/>
+We help companies build, run, deploy and scale software and infrastructure by embracing the right technologies and principles. Check out our website at https://lablabs.io/
 
 ---
 
@@ -20,29 +20,26 @@ Check out other [terraform kubernetes addons](https://github.com/orgs/lablabs/re
 ## Deployment methods
 
 ### Helm
+Deploy Helm chart via Helm resource (default method, set `enabled = true`)
 
-Deploy helm chart by helm (default method, set `enabled = true`)
+### Argo Kubernetes
+Deploy Helm chart as ArgoCD Application via Kubernetes manifest resource (set `enabled = true` and `argo_enabled = true`)
 
-### Argo kubernetes
+> **Warning**
+>
+> When deploying with ArgoCD application, Kubernetes terraform provider requires access to Kubernetes cluster API during plan time. This introduces potential issue when you want to deploy the cluster with this addon at the same time, during the same Terraform run.
+>
+> To overcome this issue, the module deploys the ArgoCD application object using the Helm provider, which does not require API access during plan. If you want to deploy the application using this workaround, you can set the `argo_helm_enabled` variable to `true`.
 
-Deploy helm chart as argo application by kubernetes manifest (set `enabled = true` and `argo_enabled = true`)
+### Argo Helm
+Deploy Helm chart as ArgoCD Application via Helm resource (set `enabled = true`, `argo_enabled = true` and `argo_helm_enabled = true`)
 
-### Argo helm
-
-When deploying with ArgoCD application, Kubernetes terraform provider requires access to Kubernetes cluster API during plan time. This introduces potential issue when you want to deploy the cluster with this addon at the same time, during the same Terraform run.
-
-To overcome this issue, the module deploys the ArgoCD application object using the Helm provider, which does not require API access during plan. If you want to deploy the application using this workaround, you can set the `argo_helm_enabled` variable to `true`.
-
-Create helm release resource and deploy it as argo application (set `enabled = true`, `argo_enabled = true` and `argo_helm_enabled = true`)
-
-<!-- Uncomment paragraph bellow if addon contains IAM resources
 ## AWS IAM resources
 
-To disable of creation IRSA role and IRSA policy, set `irsa_role_create = false` and `irsa_policy_enabled = false`, respectively -->
+To disable of creation IRSA role and IRSA policy, set `irsa_role_create = false` and `irsa_policy_enabled = false`, respectively
 
-<!-- Uncomment paragraph bellow if addon uses Role assuming
 ### Role assuming
-To assume role set `irsa_assume_role_enabled = true` and specify `irsa_assume_role_arn` variable -->
+To assume role set `irsa_assume_role_enabled = true` and specify `irsa_assume_role_arn` variable
 
 ## Repository configuration
 
@@ -86,10 +83,11 @@ See [Basic example](examples/basic/README.md) for further information.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.19.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.6.0 |
-| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 2.11.0 |
+| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | > 2.20.0 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | >= 0.9.0 |
 | <a name="requirement_utils"></a> [utils](#requirement\_utils) | >= 0.17.0 |
 
 ## Modules
@@ -103,27 +101,39 @@ No modules.
 | [aws_cloudwatch_event_rule.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_rule) | resource |
 | [aws_cloudwatch_event_target.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_target) | resource |
 | [aws_iam_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.this_0_29_x](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.this_0_29_x](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.this_additional](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_sqs_queue.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue) | resource |
 | [aws_sqs_queue_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue_policy) | resource |
 | [helm_release.argo_application](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.this](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.controller](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.crds](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.crds_argo_application](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [kubernetes_job.crds_helm_argo_application_wait](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/job) | resource |
 | [kubernetes_job.helm_argo_application_wait](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/job) | resource |
-| [kubernetes_manifest.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
+| [kubernetes_manifest.controller](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
+| [kubernetes_manifest.crds](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
+| [kubernetes_role.crds_helm_argo_application_wait](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role) | resource |
 | [kubernetes_role.helm_argo_application_wait](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role) | resource |
+| [kubernetes_role_binding.crds_helm_argo_application_wait](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role_binding) | resource |
 | [kubernetes_role_binding.helm_argo_application_wait](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role_binding) | resource |
+| [kubernetes_service_account.crds_helm_argo_application_wait](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account) | resource |
 | [kubernetes_service_account.helm_argo_application_wait](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account) | resource |
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_eks_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster) | data source |
 | [aws_iam_policy_document.queue](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.this_0_29_x](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.this_assume](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.this_irsa](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 | [aws_region.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 | [utils_deep_merge_yaml.argo_helm_values](https://registry.terraform.io/providers/cloudposse/utils/latest/docs/data-sources/deep_merge_yaml) | data source |
+| [utils_deep_merge_yaml.crds_argo_helm_values](https://registry.terraform.io/providers/cloudposse/utils/latest/docs/data-sources/deep_merge_yaml) | data source |
+| [utils_deep_merge_yaml.crds_values](https://registry.terraform.io/providers/cloudposse/utils/latest/docs/data-sources/deep_merge_yaml) | data source |
 | [utils_deep_merge_yaml.values](https://registry.terraform.io/providers/cloudposse/utils/latest/docs/data-sources/deep_merge_yaml) | data source |
 
 ## Inputs
@@ -139,7 +149,9 @@ No modules.
 | <a name="input_argo_helm_enabled"></a> [argo\_helm\_enabled](#input\_argo\_helm\_enabled) | If set to true, the ArgoCD Application manifest will be deployed using Kubernetes provider as a Helm release. Otherwise it'll be deployed as a Kubernetes manifest. See Readme for more info | `bool` | `false` | no |
 | <a name="input_argo_helm_values"></a> [argo\_helm\_values](#input\_argo\_helm\_values) | Value overrides to use when deploying argo application object with helm | `string` | `""` | no |
 | <a name="input_argo_helm_wait_backoff_limit"></a> [argo\_helm\_wait\_backoff\_limit](#input\_argo\_helm\_wait\_backoff\_limit) | Backoff limit for ArgoCD Application Helm release wait job | `number` | `6` | no |
+| <a name="input_argo_helm_wait_node_selector"></a> [argo\_helm\_wait\_node\_selector](#input\_argo\_helm\_wait\_node\_selector) | Node selector for ArgoCD Application Helm release wait job | `map(string)` | `{}` | no |
 | <a name="input_argo_helm_wait_timeout"></a> [argo\_helm\_wait\_timeout](#input\_argo\_helm\_wait\_timeout) | Timeout for ArgoCD Application Helm release wait job | `string` | `"10m"` | no |
+| <a name="input_argo_helm_wait_tolerations"></a> [argo\_helm\_wait\_tolerations](#input\_argo\_helm\_wait\_tolerations) | Tolerations for ArgoCD Application Helm release wait job | `list(any)` | `[]` | no |
 | <a name="input_argo_info"></a> [argo\_info](#input\_argo\_info) | ArgoCD info manifest parameter | <pre>list(object({<br>    name  = string<br>    value = string<br>  }))</pre> | <pre>[<br>  {<br>    "name": "terraform",<br>    "value": "true"<br>  }<br>]</pre> | no |
 | <a name="input_argo_kubernetes_manifest_computed_fields"></a> [argo\_kubernetes\_manifest\_computed\_fields](#input\_argo\_kubernetes\_manifest\_computed\_fields) | List of paths of fields to be handled as "computed". The user-configured value for the field will be overridden by any different value returned by the API after apply. | `list(string)` | <pre>[<br>  "metadata.labels",<br>  "metadata.annotations",<br>  "metadata.finalizers"<br>]</pre> | no |
 | <a name="input_argo_kubernetes_manifest_field_manager_force_conflicts"></a> [argo\_kubernetes\_manifest\_field\_manager\_force\_conflicts](#input\_argo\_kubernetes\_manifest\_field\_manager\_force\_conflicts) | Forcibly override any field manager conflicts when applying the kubernetes manifest resource | `bool` | `false` | no |
@@ -151,10 +163,46 @@ No modules.
 | <a name="input_argo_spec"></a> [argo\_spec](#input\_argo\_spec) | ArgoCD Application spec configuration. Override or create additional spec parameters | `any` | `{}` | no |
 | <a name="input_argo_sync_policy"></a> [argo\_sync\_policy](#input\_argo\_sync\_policy) | ArgoCD syncPolicy manifest parameter | `any` | `{}` | no |
 | <a name="input_aws_partition"></a> [aws\_partition](#input\_aws\_partition) | AWS partition in which the resources are located. Avaliable values are `aws`, `aws-cn`, `aws-us-gov` | `string` | `"aws"` | no |
+| <a name="input_crds_argo_helm_values"></a> [crds\_argo\_helm\_values](#input\_crds\_argo\_helm\_values) | Value overrides to use when deploying argo application object with helm | `string` | `""` | no |
+| <a name="input_crds_argo_kubernetes_manifest_computed_fields"></a> [crds\_argo\_kubernetes\_manifest\_computed\_fields](#input\_crds\_argo\_kubernetes\_manifest\_computed\_fields) | List of paths of fields to be handled as "computed". The user-configured value for the field will be overridden by any different value returned by the API after apply. | `list(string)` | <pre>[<br>  "metadata.labels",<br>  "metadata.annotations",<br>  "metadata.finalizers"<br>]</pre> | no |
+| <a name="input_crds_argo_kubernetes_manifest_field_manager_force_conflicts"></a> [crds\_argo\_kubernetes\_manifest\_field\_manager\_force\_conflicts](#input\_crds\_argo\_kubernetes\_manifest\_field\_manager\_force\_conflicts) | Forcibly override any field manager conflicts when applying the kubernetes manifest resource | `bool` | `false` | no |
+| <a name="input_crds_argo_kubernetes_manifest_field_manager_name"></a> [crds\_argo\_kubernetes\_manifest\_field\_manager\_name](#input\_crds\_argo\_kubernetes\_manifest\_field\_manager\_name) | The name of the field manager to use when applying the kubernetes manifest resource. Defaults to Terraform | `string` | `"Terraform"` | no |
+| <a name="input_crds_argo_kubernetes_manifest_wait_fields"></a> [crds\_argo\_kubernetes\_manifest\_wait\_fields](#input\_crds\_argo\_kubernetes\_manifest\_wait\_fields) | A map of fields and a corresponding regular expression with a pattern to wait for. The provider will wait until the field matches the regular expression. Use * for any value. | `map(string)` | `{}` | no |
+| <a name="input_crds_argo_metadata"></a> [crds\_argo\_metadata](#input\_crds\_argo\_metadata) | ArgoCD Application metadata configuration. Override or create additional metadata parameters | `any` | <pre>{<br>  "finalizers": [<br>    "resources-finalizer.argocd.argoproj.io"<br>  ]<br>}</pre> | no |
+| <a name="input_crds_argo_spec"></a> [crds\_argo\_spec](#input\_crds\_argo\_spec) | ArgoCD Application spec configuration. Override or create additional spec parameters | `any` | `{}` | no |
+| <a name="input_crds_argo_sync_policy"></a> [crds\_argo\_sync\_policy](#input\_crds\_argo\_sync\_policy) | ArgoCD syncPolicy manifest parameter | `any` | `{}` | no |
+| <a name="input_crds_helm_atomic"></a> [crds\_helm\_atomic](#input\_crds\_helm\_atomic) | If set, installation process purges chart on fail. The wait flag will be set automatically if atomic is used | `bool` | `false` | no |
+| <a name="input_crds_helm_chart_name"></a> [crds\_helm\_chart\_name](#input\_crds\_helm\_chart\_name) | Helm chart name to be installed | `string` | `"karpenter-crd"` | no |
+| <a name="input_crds_helm_chart_version"></a> [crds\_helm\_chart\_version](#input\_crds\_helm\_chart\_version) | Version of the Helm chart | `string` | `"v0.33.1"` | no |
+| <a name="input_crds_helm_cleanup_on_fail"></a> [crds\_helm\_cleanup\_on\_fail](#input\_crds\_helm\_cleanup\_on\_fail) | Allow deletion of new resources created in this helm upgrade when upgrade fails | `bool` | `false` | no |
+| <a name="input_crds_helm_dependency_update"></a> [crds\_helm\_dependency\_update](#input\_crds\_helm\_dependency\_update) | Runs helm dependency update before installing the chart | `bool` | `false` | no |
+| <a name="input_crds_helm_description"></a> [crds\_helm\_description](#input\_crds\_helm\_description) | Set helm release description attribute (visible in the history) | `string` | `""` | no |
+| <a name="input_crds_helm_devel"></a> [crds\_helm\_devel](#input\_crds\_helm\_devel) | Use helm chart development versions, too. Equivalent to version '>0.0.0-0'. If version is set, this is ignored | `bool` | `false` | no |
+| <a name="input_crds_helm_disable_openapi_validation"></a> [crds\_helm\_disable\_openapi\_validation](#input\_crds\_helm\_disable\_openapi\_validation) | If set, the installation process will not validate rendered helm templates against the Kubernetes OpenAPI Schema | `bool` | `false` | no |
+| <a name="input_crds_helm_disable_webhooks"></a> [crds\_helm\_disable\_webhooks](#input\_crds\_helm\_disable\_webhooks) | Prevent helm chart hooks from running | `bool` | `false` | no |
+| <a name="input_crds_helm_force_update"></a> [crds\_helm\_force\_update](#input\_crds\_helm\_force\_update) | Force helm resource update through delete/recreate if needed | `bool` | `false` | no |
+| <a name="input_crds_helm_keyring"></a> [crds\_helm\_keyring](#input\_crds\_helm\_keyring) | Location of public keys used for verification. Used only if helm\_package\_verify is true | `string` | `"~/.gnupg/pubring.gpg"` | no |
+| <a name="input_crds_helm_lint"></a> [crds\_helm\_lint](#input\_crds\_helm\_lint) | Run the helm chart linter during the plan | `bool` | `false` | no |
+| <a name="input_crds_helm_package_verify"></a> [crds\_helm\_package\_verify](#input\_crds\_helm\_package\_verify) | Verify the package before installing it. Helm uses a provenance file to verify the integrity of the chart; this must be hosted alongside the chart | `bool` | `false` | no |
+| <a name="input_crds_helm_postrender"></a> [crds\_helm\_postrender](#input\_crds\_helm\_postrender) | Value block with a path to a binary file to run after helm renders the manifest which can alter the manifest contents | `map(any)` | `{}` | no |
+| <a name="input_crds_helm_recreate_pods"></a> [crds\_helm\_recreate\_pods](#input\_crds\_helm\_recreate\_pods) | Perform pods restart during helm upgrade/rollback | `bool` | `false` | no |
+| <a name="input_crds_helm_release_max_history"></a> [crds\_helm\_release\_max\_history](#input\_crds\_helm\_release\_max\_history) | Maximum number of release versions stored per release | `number` | `0` | no |
+| <a name="input_crds_helm_release_name"></a> [crds\_helm\_release\_name](#input\_crds\_helm\_release\_name) | Helm release name | `string` | `"karpenter-crds"` | no |
+| <a name="input_crds_helm_render_subchart_notes"></a> [crds\_helm\_render\_subchart\_notes](#input\_crds\_helm\_render\_subchart\_notes) | If set, render helm subchart notes along with the parent | `bool` | `true` | no |
+| <a name="input_crds_helm_replace"></a> [crds\_helm\_replace](#input\_crds\_helm\_replace) | Re-use the given name of helm release, only if that name is a deleted release which remains in the history. This is unsafe in production | `bool` | `false` | no |
+| <a name="input_crds_helm_reset_values"></a> [crds\_helm\_reset\_values](#input\_crds\_helm\_reset\_values) | When upgrading, reset the values to the ones built into the helm chart | `bool` | `false` | no |
+| <a name="input_crds_helm_reuse_values"></a> [crds\_helm\_reuse\_values](#input\_crds\_helm\_reuse\_values) | When upgrading, reuse the last helm release's values and merge in any overrides. If 'helm\_reset\_values' is specified, this is ignored | `bool` | `false` | no |
+| <a name="input_crds_helm_set_sensitive"></a> [crds\_helm\_set\_sensitive](#input\_crds\_helm\_set\_sensitive) | Value block with custom sensitive values to be merged with the values yaml that won't be exposed in the plan's diff | `map(any)` | `{}` | no |
+| <a name="input_crds_helm_timeout"></a> [crds\_helm\_timeout](#input\_crds\_helm\_timeout) | Time in seconds to wait for any individual kubernetes operation (like Jobs for hooks) | `number` | `300` | no |
+| <a name="input_crds_helm_wait"></a> [crds\_helm\_wait](#input\_crds\_helm\_wait) | Will wait until all helm release resources are in a ready state before marking the release as successful. It will wait for as long as timeout | `bool` | `true` | no |
+| <a name="input_crds_helm_wait_for_jobs"></a> [crds\_helm\_wait\_for\_jobs](#input\_crds\_helm\_wait\_for\_jobs) | If wait is enabled, will wait until all helm Jobs have been completed before marking the release as successful. It will wait for as long as timeout | `bool` | `false` | no |
+| <a name="input_crds_settings"></a> [crds\_settings](#input\_crds\_settings) | Additional helm sets which will be passed to the Helm chart values, see https://github.com/aws/karpenter/tree/main/charts/karpenter-crd | `map(any)` | `{}` | no |
+| <a name="input_crds_values"></a> [crds\_values](#input\_crds\_values) | Additional yaml encoded values which will be passed to the Helm chart, see https://github.com/aws/karpenter/tree/main/charts/karpenter-crd | `string` | `""` | no |
+| <a name="input_enable_0_29_x_support"></a> [enable\_0\_29\_x\_support](#input\_enable\_0\_29\_x\_support) | Whether to enable 0.29.x support | `bool` | `false` | no |
 | <a name="input_enabled"></a> [enabled](#input\_enabled) | Variable indicating whether deployment is enabled | `bool` | `true` | no |
 | <a name="input_helm_atomic"></a> [helm\_atomic](#input\_helm\_atomic) | If set, installation process purges chart on fail. The wait flag will be set automatically if atomic is used | `bool` | `false` | no |
 | <a name="input_helm_chart_name"></a> [helm\_chart\_name](#input\_helm\_chart\_name) | Helm chart name to be installed | `string` | `"karpenter"` | no |
-| <a name="input_helm_chart_version"></a> [helm\_chart\_version](#input\_helm\_chart\_version) | Version of the Helm chart | `string` | `"0.28.0"` | no |
+| <a name="input_helm_chart_version"></a> [helm\_chart\_version](#input\_helm\_chart\_version) | Version of the Helm chart | `string` | `"v0.32.5"` | no |
 | <a name="input_helm_cleanup_on_fail"></a> [helm\_cleanup\_on\_fail](#input\_helm\_cleanup\_on\_fail) | Allow deletion of new resources created in this helm upgrade when upgrade fails | `bool` | `false` | no |
 | <a name="input_helm_create_namespace"></a> [helm\_create\_namespace](#input\_helm\_create\_namespace) | Create the namespace if it does not yet exist | `bool` | `true` | no |
 | <a name="input_helm_dependency_update"></a> [helm\_dependency\_update](#input\_helm\_dependency\_update) | Runs helm dependency update before installing the chart | `bool` | `false` | no |
@@ -209,7 +257,7 @@ No modules.
 |------|-------------|
 | <a name="output_helm_release_application_metadata"></a> [helm\_release\_application\_metadata](#output\_helm\_release\_application\_metadata) | Argo application helm release attributes |
 | <a name="output_helm_release_metadata"></a> [helm\_release\_metadata](#output\_helm\_release\_metadata) | Helm release attributes |
-| <a name="output_iam_irsa_role_attributes"></a> [iam\_irsa\_role\_attributes](#output\_iam\_irsa\_role\_attributes) | karpenter IAM role atributes |
+| <a name="output_iam_irsa_role_attributes"></a> [iam\_irsa\_role\_attributes](#output\_iam\_irsa\_role\_attributes) | Karpenter IAM role attributes |
 | <a name="output_kubernetes_application_attributes"></a> [kubernetes\_application\_attributes](#output\_kubernetes\_application\_attributes) | Argo kubernetes manifest attributes |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 

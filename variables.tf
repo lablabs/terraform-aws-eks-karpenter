@@ -41,7 +41,7 @@ variable "helm_chart_name" {
 
 variable "helm_chart_version" {
   type        = string
-  default     = "0.28.0"
+  default     = "v0.32.5"
   description = "Version of the Helm chart"
 }
 
@@ -179,6 +179,18 @@ variable "argo_helm_wait_backoff_limit" {
   type        = number
   default     = 6
   description = "Backoff limit for ArgoCD Application Helm release wait job"
+}
+
+variable "argo_helm_wait_node_selector" {
+  type        = map(string)
+  default     = {}
+  description = "Node selector for ArgoCD Application Helm release wait job"
+}
+
+variable "argo_helm_wait_tolerations" {
+  type        = list(any)
+  default     = []
+  description = "Tolerations for ArgoCD Application Helm release wait job"
 }
 
 variable "argo_destination_server" {

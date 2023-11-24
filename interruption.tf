@@ -1,8 +1,10 @@
 locals {
-  aws_partition_dns_suffix = data.aws_partition.current.dns_suffix
+  aws_partition_dns_suffix = data.aws_partition.current[0].dns_suffix
 }
 
-data "aws_partition" "current" {}
+data "aws_partition" "current" {
+  count = var.enabled ? 1 : 0
+}
 
 resource "aws_sqs_queue" "this" {
   count = var.enabled ? 1 : 0
@@ -38,10 +40,7 @@ resource "aws_sqs_queue_policy" "this" {
   policy    = data.aws_iam_policy_document.queue[0].json
 }
 
-
-
 # Node Termination Event Rules
-
 locals {
   events = {
     health_event = {
