@@ -1,8 +1,3 @@
-resource "aws_iam_role" "this" {
-  name               = "karpenter-node-role"
-  assume_role_policy = data.aws_iam_policy_document.karpenter_node_assume_policy.json
-}
-
 data "aws_iam_policy_document" "karpenter_node_assume_policy" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -13,6 +8,11 @@ data "aws_iam_policy_document" "karpenter_node_assume_policy" {
     }
     effect = "Allow"
   }
+}
+
+resource "aws_iam_role" "this" {
+  name               = "karpenter-node-role"
+  assume_role_policy = data.aws_iam_policy_document.karpenter_node_assume_policy.json
 }
 
 module "addon_installation_disabled" {

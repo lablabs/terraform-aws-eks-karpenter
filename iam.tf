@@ -2,100 +2,338 @@ locals {
   irsa_role_create = var.enabled && var.rbac_create && var.service_account_create && var.irsa_role_create
 }
 
-data "aws_region" "this" {}
+data "aws_region" "this" {
+  count = var.enabled ? 1 : 0
+}
 
-data "aws_caller_identity" "this" {}
+data "aws_caller_identity" "this" {
+  count = var.enabled ? 1 : 0
+}
 
 data "aws_iam_policy_document" "this" {
+  #checkov:skip=CKV_AWS_111: In the future, we may further lock down ec2:RunInstances by using tags in related resources.
+  #checkov:skip=CKV_AWS_356: Describe need to be allowed on all resources
   count = local.irsa_role_create && var.irsa_policy_enabled && !var.irsa_assume_role_enabled ? 1 : 0
 
-  #checkov:skip=CKV_AWS_111:In the future, we may further lock down ec2:RunInstances by using tags in related resources.
-  #checkov:skip=CKV_AWS_356: Describe need to be allowed on all resources
+  # Aligned with https://github.com/aws/karpenter-provider-aws/blob/v0.32.4/website/content/en/v0.32/getting-started/getting-started-with-karpenter/cloudformation.yaml
   statement {
-    sid = "NodeResourceCreation"
-    actions = [
-      "ec2:CreateLaunchTemplate",
-      "ec2:CreateFleet",
-      "ec2:CreateTags",
-      "ec2:DescribeLaunchTemplates",
-      "ec2:DescribeImages",
-      "ec2:DescribeInstances",
-      "ec2:DescribeSecurityGroups",
-      "ec2:DescribeSubnets",
-      "ec2:DescribeInstanceTypes",
-      "ec2:DescribeInstanceTypeOfferings",
-      "ec2:DescribeAvailabilityZones",
-      "ec2:DescribeSpotPriceHistory",
-      "pricing:GetProducts",
-      "ec2:RunInstances"
+    sid    = "AllowScopedEC2InstanceActions"
+    effect = "Allow"
+
+    resources = [
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}::image/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}::snapshot/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:spot-instances-request/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:security-group/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:subnet/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
     ]
-    resources = ["*"]
+
+    actions = [
+      "ec2:RunInstances",
+      "ec2:CreateFleet",
+    ]
   }
 
   statement {
-    sid = "NodeResourceDeletion"
-    actions = [
-      "ec2:TerminateInstances",
+    sid    = "AllowScopedEC2InstanceActionsWithTags"
+    effect = "Allow"
+
+    resources = [
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:fleet/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:instance/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:volume/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:network-interface/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
     ]
 
-    resources = ["*"]
+    actions = [
+      "ec2:RunInstances",
+      "ec2:CreateFleet",
+      "ec2:CreateLaunchTemplate",
+    ]
 
     condition {
       test     = "StringEquals"
-      variable = "ec2:ResourceTag/kubernetes.io/cluster/${var.cluster_name}"
+      variable = "aws:RequestTag/kubernetes.io/cluster/${var.cluster_name}"
       values   = ["owned"]
     }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:RequestTag/karpenter.sh/nodepool"
+      values   = ["*"]
+    }
   }
+
   statement {
-    sid = "KarpenterResourceDeletion"
+    sid    = "AllowScopedResourceCreationTagging"
+    effect = "Allow"
+
+    resources = [
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:fleet/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:instance/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:volume/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:network-interface/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
+    ]
+
+    actions = ["ec2:CreateTags"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/kubernetes.io/cluster/${var.cluster_name}"
+      values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:CreateAction"
+
+      values = [
+        "RunInstances",
+        "CreateFleet",
+        "CreateLaunchTemplate",
+      ]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:RequestTag/karpenter.sh/nodepool"
+      values   = ["*"]
+    }
+  }
+
+  statement {
+    sid       = "AllowScopedResourceTagging"
+    effect    = "Allow"
+    resources = ["arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:instance/*"]
+    actions   = ["ec2:CreateTags"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/kubernetes.io/cluster/${var.cluster_name}"
+      values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:ResourceTag/karpenter.sh/nodepool"
+      values   = ["*"]
+    }
+
+    condition {
+      test     = "ForAllValues:StringEquals"
+      variable = "aws:TagKeys"
+
+      values = [
+        "karpenter.sh/nodeclaim",
+        "Name",
+      ]
+    }
+  }
+
+  statement {
+    sid    = "AllowScopedDeletion"
+    effect = "Allow"
+
+    resources = [
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:instance/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
+    ]
+
     actions = [
+      "ec2:TerminateInstances",
       "ec2:DeleteLaunchTemplate",
     ]
 
-    resources = ["*"]
     condition {
       test     = "StringEquals"
-      variable = "ec2:ResourceTag/karpenter.k8s.aws/cluster"
-      values   = [var.cluster_name]
+      variable = "aws:ResourceTag/kubernetes.io/cluster/${var.cluster_name}"
+      values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:ResourceTag/karpenter.sh/nodepool"
+      values   = ["*"]
     }
   }
+
   statement {
-    sid       = "GetParameters"
+    sid       = "AllowRegionalReadActions"
+    effect    = "Allow"
+    resources = ["*"]
+
+    actions = [
+      "ec2:DescribeAvailabilityZones",
+      "ec2:DescribeImages",
+      "ec2:DescribeInstances",
+      "ec2:DescribeInstanceTypeOfferings",
+      "ec2:DescribeInstanceTypes",
+      "ec2:DescribeLaunchTemplates",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSpotPriceHistory",
+      "ec2:DescribeSubnets",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestedRegion"
+      values   = [data.aws_region.this[0].name]
+    }
+  }
+
+  statement {
+    sid       = "AllowSSMReadActions"
+    effect    = "Allow"
+    resources = ["arn:${var.aws_partition}:ssm:${data.aws_region.this[0].name}::parameter/aws/service/*"]
     actions   = ["ssm:GetParameter"]
-    resources = ["arn:aws:ssm:*:*:parameter/aws/service/*"]
   }
 
   statement {
-    sid = "PassRole"
+    sid       = "AllowPricingReadActions"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["pricing:GetProducts"]
+  }
+
+  statement {
+    sid       = "AllowInterruptionQueueActions"
+    effect    = "Allow"
+    resources = [aws_sqs_queue.this[0].arn]
+
     actions = [
-      "iam:PassRole"
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ReceiveMessage",
     ]
+  }
+
+  statement {
+    sid       = "AllowPassingInstanceRole"
+    effect    = "Allow"
     resources = var.karpenter_node_role_arns
-    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["ec2.amazonaws.com"]
+    }
   }
 
   statement {
-    sid = "EKSClusterEndpointLookup"
-    actions = [
-      "eks:DescribeCluster"
-    ]
-    resources = ["arn:${var.aws_partition}:eks:${data.aws_region.this.name}:${data.aws_caller_identity.this.id}:cluster/${var.cluster_name}"]
+    sid       = "AllowScopedInstanceProfileCreationActions"
     effect    = "Allow"
+    resources = ["*"]
+    actions   = ["iam:CreateInstanceProfile"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/kubernetes.io/cluster/${var.cluster_name}"
+      values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/topology.kubernetes.io/region"
+      values   = [data.aws_region.this[0].name]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:RequestTag/karpenter.k8s.aws/ec2nodeclass"
+      values   = ["*"]
+    }
   }
 
-  dynamic "statement" {
-    for_each = var.enabled ? [0] : []
+  statement {
+    sid       = "AllowScopedInstanceProfileTagActions"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["iam:TagInstanceProfile"]
 
-    content {
-      sid = "HandleInteruptionsQueueMessages"
-      actions = [
-        "sqs:DeleteMessage",
-        "sqs:GetQueueUrl",
-        "sqs:GetQueueAttributes",
-        "sqs:ReceiveMessage",
-      ]
-      resources = [aws_sqs_queue.this[0].arn]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/kubernetes.io/cluster/${var.cluster_name}"
+      values   = ["owned"]
     }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/topology.kubernetes.io/region"
+      values   = [data.aws_region.this[0].name]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/kubernetes.io/cluster/${var.cluster_name}"
+      values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/topology.kubernetes.io/region"
+      values   = [data.aws_region.this[0].name]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:ResourceTag/karpenter.k8s.aws/ec2nodeclass"
+      values   = ["*"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:RequestTag/karpenter.k8s.aws/ec2nodeclass"
+      values   = ["*"]
+    }
+  }
+
+  statement {
+    sid       = "AllowScopedInstanceProfileActions"
+    effect    = "Allow"
+    resources = ["*"]
+
+    actions = [
+      "iam:AddRoleToInstanceProfile",
+      "iam:RemoveRoleFromInstanceProfile",
+      "iam:DeleteInstanceProfile",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/kubernetes.io/cluster/${var.cluster_name}"
+      values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/topology.kubernetes.io/region"
+      values   = [data.aws_region.this[0].name]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:ResourceTag/karpenter.k8s.aws/ec2nodeclass"
+      values   = ["*"]
+    }
+  }
+
+  statement {
+    sid       = "AllowInstanceProfileReadActions"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["iam:GetInstanceProfile"]
+  }
+
+  statement {
+    sid       = "AllowAPIServerEndpointDiscovery"
+    effect    = "Allow"
+    resources = ["arn:${var.aws_partition}:eks:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:cluster/${var.cluster_name}"]
+    actions   = ["eks:DescribeCluster"]
   }
 }
 
