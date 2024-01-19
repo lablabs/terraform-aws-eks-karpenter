@@ -10,11 +10,15 @@ locals {
       "repoURL" : var.helm_repo_oci ? local.helm_repo_url : "https://${local.helm_repo_url}"
       "chart" : var.helm_chart_name
       "targetRevision" : var.helm_chart_version
-      "helm" : {
-        "releaseName" : var.helm_release_name
-        "parameters" : [for k, v in var.settings : tomap({ "forceString" : true, "name" : k, "value" : v })]
-        "values" : var.enabled ? data.utils_deep_merge_yaml.values[0].output : ""
-      }
+      "helm" : merge(
+        {
+          "releaseName" : var.helm_release_name
+          "values" : var.enabled ? data.utils_deep_merge_yaml.values[0].output : ""
+        },
+        length(var.settings) > 0 ? {
+          "parameters" : [for k, v in var.settings : tomap({ "forceString" : true, "name" : k, "value" : v })]
+        } : {}
+      )
     }
     "destination" : {
       "server" : var.argo_destination_server
