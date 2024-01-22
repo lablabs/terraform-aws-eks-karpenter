@@ -13,7 +13,6 @@ locals {
       "helm" : merge(
         {
           "releaseName" : var.helm_release_name
-          "parameters" : length(var.settings) == 0 ? null : [for k, v in var.settings : tomap({ "forceString" : true, "name" : k, "value" : v })]
           "values" : var.enabled ? data.utils_deep_merge_yaml.values[0].output : ""
           "skipCrds" : true # CRDs are installed in a separate ArgoCD Application
         },
