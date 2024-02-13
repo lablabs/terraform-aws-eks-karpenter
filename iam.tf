@@ -74,6 +74,7 @@ data "aws_iam_policy_document" "this" {
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:fleet/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:instance/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:volume/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:spot-instances-request/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:network-interface/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
     ]
