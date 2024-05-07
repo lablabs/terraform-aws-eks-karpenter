@@ -15,24 +15,45 @@ data "aws_iam_policy_document" "this" {
   #checkov:skip=CKV_AWS_356: Describe need to be allowed on all resources
   count = local.irsa_role_create && var.irsa_policy_enabled && !var.irsa_assume_role_enabled ? 1 : 0
 
-  # Aligned with https://github.com/aws/karpenter-provider-aws/blob/v0.32.4/website/content/en/v0.32/getting-started/getting-started-with-karpenter/cloudformation.yaml
+  # Aligned with https://github.com/aws/karpenter-provider-aws/blob/v0.36.1/website/content/en/preview/getting-started/getting-started-with-karpenter/cloudformation.yaml
   statement {
-    sid    = "AllowScopedEC2InstanceActions"
+    sid    = "AllowScopedEC2InstanceAccessActions"
     effect = "Allow"
 
     resources = [
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}::image/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}::snapshot/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:spot-instances-request/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:security-group/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:subnet/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
     ]
 
     actions = [
       "ec2:RunInstances",
       "ec2:CreateFleet",
     ]
+  }
+
+  statement {
+    sid       = "AllowScopedEC2LaunchTemplateAccessActions"
+    effect    = "Allow"
+    resources = ["arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*"]
+
+    actions = [
+      "ec2:RunInstances",
+      "ec2:CreateFleet",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/kubernetes.io/cluster/${var.cluster_name}"
+      values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:ResourceTag/karpenter.sh/nodepool"
+      values   = ["*"]
+    }
   }
 
   statement {
@@ -45,6 +66,7 @@ data "aws_iam_policy_document" "this" {
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:volume/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:network-interface/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:spot-instances-request/*",
     ]
 
     actions = [
@@ -74,9 +96,9 @@ data "aws_iam_policy_document" "this" {
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:fleet/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:instance/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:volume/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:spot-instances-request/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:network-interface/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:spot-instances-request/*",
     ]
 
     actions = ["ec2:CreateTags"]
@@ -206,7 +228,6 @@ data "aws_iam_policy_document" "this" {
 
     actions = [
       "sqs:DeleteMessage",
-      "sqs:GetQueueAttributes",
       "sqs:GetQueueUrl",
       "sqs:ReceiveMessage",
     ]

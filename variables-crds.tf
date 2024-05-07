@@ -8,7 +8,7 @@ variable "crds_helm_chart_name" {
 
 variable "crds_helm_chart_version" {
   type        = string
-  default     = "v0.33.1"
+  default     = "0.36.1"
   description = "Version of the Helm chart"
 }
 
