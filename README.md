@@ -1,13 +1,13 @@
 # AWS EKS Karpenter Terraform module
 
-[<img src="https://lablabs.io/static/ll-logo.png" width=350px>](https://lablabs.io/)
+[<img src="https://lablabs.io/static/logo-readme-aws.png" width=700px>](https://lablabs.io/)
 
-We help companies build, run, deploy and scale software and infrastructure by embracing the right technologies and principles. Check out our website at https://lablabs.io/
+## About us: 
+[Labyrinth Labs](https://lablabs.io/) is a one-stop-shop for DevOps, Cloud & Kubernetes! We specialize in creating powerful, scalable and cloud-native platforms tailored to elevate your business. 
+
+[As a team of experienced DevOps engineers](https://lablabs.io/about/), we know how to help our customers start their journey in the cloud, address the issues they have in their current setups and provide a strategic solution to transform their infrastructure. 
 
 ---
-
-[![Terraform validate](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/validate.yaml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/validate.yaml)
-[![pre-commit](https://github.com/lablabs/terraform-aws-karpenter/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/pre-commit.yml)
 
 ## Description
 
@@ -298,3 +298,38 @@ See [LICENSE](LICENSE) for full details.
     KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
+    
+---
+## About LARA: 
+This particular module is a part of our cloud-native platform LARA, however it can also be used as a standalone module. But, what is LARA exactly?
+
+[LARA [Labyrinth Labs Reference Architecture]](https://lablabs.io/wp-content/uploads/2022/10/lara-overview.pdf) is our cloud-native platform consisting of ready made, battle tested and proven building blocks for rapid set up of well architected infrastructure. It’s based on best practices and open source to ensure long lasting value and no vendor lock in. 
+
+### Inside LARA: 
+* AWS Organization & Access Management
+    - Centrally govern your all environments, manage access rights, permissions and policies.
+* VPC & Related services
+    - Network foundation, app and edge networking, hybrid connectivity and security.
+* Kubernetes
+    - Operate kubernetes on your own infrastructure, experience ultimate scaling and cost savings.
+* Observability
+    - Grafana, Loki, Thanos, Tempo, Opensearch, Elastic. You name it, we have it.
+* Databases & Storage
+    - Choose from plenty of purpose-built database engines to achieve the best efficiency.
+* Messaging & Streaming
+    - Managed services for messaging and streaming for modern application architecture.
+* Security & Compliance
+    - Workload isolation, access policies, data governance, security scans.
+* Advanced Networking
+    - Enable service mesh, connect 3rd parties or on-prem sites and allow world-wide content delivery.
+* Continuous Deployment
+    - Provide your team with GitOps based workflows supporting advanced deployment methods.
+
+### Contribution: 
+Got questions, ideas, or wanna see something new here? Feel free to create an issue in this repository, we're all ears!
+
+
+### Support: 
+Building cloud platforms from the ground up can be quite challenging. We’ve been there, done that, and invested countless hours crafting our own. That’s why it’s safe to say that it’s our bread and butter now.
+
+If you're finding yourself in a tough spot or navigating through the complexities of platform development, we’re happy to help! [Contact us here](https://lablabs.io/contact/) with any cloud related issues. 
