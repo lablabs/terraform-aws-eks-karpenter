@@ -2,10 +2,10 @@
 
 [<img src="https://lablabs.io/static/logo-readme-aws.png" width=700px>](https://lablabs.io/)
 
-## About us: 
-[Labyrinth Labs](https://lablabs.io/) is a one-stop-shop for DevOps, Cloud & Kubernetes! We specialize in creating powerful, scalable and cloud-native platforms tailored to elevate your business. 
+## About us:
+[Labyrinth Labs](https://lablabs.io/) is a one-stop-shop for DevOps, Cloud & Kubernetes! We specialize in creating powerful, scalable and cloud-native platforms tailored to elevate your business.
 
-[As a team of experienced DevOps engineers](https://lablabs.io/about/), we know how to help our customers start their journey in the cloud, address the issues they have in their current setups and provide a strategic solution to transform their infrastructure. 
+[As a team of experienced DevOps engineers](https://lablabs.io/about/), we know how to help our customers start their journey in the cloud, address the issues they have in their current setups and provide a strategic solution to transform their infrastructure.
 
 ---
 
@@ -300,12 +300,12 @@ See [LICENSE](LICENSE) for full details.
     under the License.
     
 ---
-## About LARA: 
+## About LARA:
 This particular module is a part of our cloud-native platform LARA, however it can also be used as a standalone module. But, what is LARA exactly?
 
-[LARA [Labyrinth Labs Reference Architecture]](https://lablabs.io/wp-content/uploads/2022/10/lara-overview.pdf) is our cloud-native platform consisting of ready made, battle tested and proven building blocks for rapid set up of well architected infrastructure. It’s based on best practices and open source to ensure long lasting value and no vendor lock in. 
+[LARA [Labyrinth Labs Reference Architecture]](https://lablabs.io/wp-content/uploads/2022/10/lara-overview.pdf) is our cloud-native platform consisting of ready made, battle tested and proven building blocks for rapid set up of well architected infrastructure. It’s based on best practices and open source to ensure long lasting value and no vendor lock in.
 
-### Inside LARA: 
+### Inside LARA:
 * AWS Organization & Access Management
     - Centrally govern your all environments, manage access rights, permissions and policies.
 * VPC & Related services
@@ -325,11 +325,10 @@ This particular module is a part of our cloud-native platform LARA, however it c
 * Continuous Deployment
     - Provide your team with GitOps based workflows supporting advanced deployment methods.
 
-### Contribution: 
+### Contribution:
 Got questions, ideas, or wanna see something new here? Feel free to create an issue in this repository, we're all ears!
 
-
-### Support: 
+### Support:
 Building cloud platforms from the ground up can be quite challenging. We’ve been there, done that, and invested countless hours crafting our own. That’s why it’s safe to say that it’s our bread and butter now.
 
-If you're finding yourself in a tough spot or navigating through the complexities of platform development, we’re happy to help! [Contact us here](https://lablabs.io/contact/) with any cloud related issues. 
+If you're finding yourself in a tough spot or navigating through the complexities of platform development, we’re happy to help! [Contact us here](https://lablabs.io/contact/) with any cloud related issues.
