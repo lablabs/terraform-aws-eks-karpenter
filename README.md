@@ -298,7 +298,7 @@ See [LICENSE](LICENSE) for full details.
     KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
-    
+
 ---
 ## About LARA:
 This particular module is a part of our cloud-native platform LARA, however it can also be used as a standalone module. But, what is LARA exactly?
