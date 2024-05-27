@@ -170,7 +170,7 @@ No modules.
 | <a name="input_crds_argo_sync_policy"></a> [crds\_argo\_sync\_policy](#input\_crds\_argo\_sync\_policy) | ArgoCD syncPolicy manifest parameter | `any` | `{}` | no |
 | <a name="input_crds_helm_atomic"></a> [crds\_helm\_atomic](#input\_crds\_helm\_atomic) | If set, installation process purges chart on fail. The wait flag will be set automatically if atomic is used | `bool` | `false` | no |
 | <a name="input_crds_helm_chart_name"></a> [crds\_helm\_chart\_name](#input\_crds\_helm\_chart\_name) | Helm chart name to be installed | `string` | `"karpenter-crd"` | no |
-| <a name="input_crds_helm_chart_version"></a> [crds\_helm\_chart\_version](#input\_crds\_helm\_chart\_version) | Version of the Helm chart | `string` | `"0.36.1"` | no |
+| <a name="input_crds_helm_chart_version"></a> [crds\_helm\_chart\_version](#input\_crds\_helm\_chart\_version) | Version of the Helm chart | `string` | `"0.36.2"` | no |
 | <a name="input_crds_helm_cleanup_on_fail"></a> [crds\_helm\_cleanup\_on\_fail](#input\_crds\_helm\_cleanup\_on\_fail) | Allow deletion of new resources created in this helm upgrade when upgrade fails | `bool` | `false` | no |
 | <a name="input_crds_helm_dependency_update"></a> [crds\_helm\_dependency\_update](#input\_crds\_helm\_dependency\_update) | Runs helm dependency update before installing the chart | `bool` | `false` | no |
 | <a name="input_crds_helm_description"></a> [crds\_helm\_description](#input\_crds\_helm\_description) | Set helm release description attribute (visible in the history) | `string` | `""` | no |
@@ -198,7 +198,7 @@ No modules.
 | <a name="input_enabled"></a> [enabled](#input\_enabled) | Variable indicating whether deployment is enabled | `bool` | `true` | no |
 | <a name="input_helm_atomic"></a> [helm\_atomic](#input\_helm\_atomic) | If set, installation process purges chart on fail. The wait flag will be set automatically if atomic is used | `bool` | `false` | no |
 | <a name="input_helm_chart_name"></a> [helm\_chart\_name](#input\_helm\_chart\_name) | Helm chart name to be installed | `string` | `"karpenter"` | no |
-| <a name="input_helm_chart_version"></a> [helm\_chart\_version](#input\_helm\_chart\_version) | Version of the Helm chart | `string` | `"0.36.1"` | no |
+| <a name="input_helm_chart_version"></a> [helm\_chart\_version](#input\_helm\_chart\_version) | Version of the Helm chart | `string` | `"0.36.2"` | no |
 | <a name="input_helm_cleanup_on_fail"></a> [helm\_cleanup\_on\_fail](#input\_helm\_cleanup\_on\_fail) | Allow deletion of new resources created in this helm upgrade when upgrade fails | `bool` | `false` | no |
 | <a name="input_helm_create_namespace"></a> [helm\_create\_namespace](#input\_helm\_create\_namespace) | Create the namespace if it does not yet exist | `bool` | `true` | no |
 | <a name="input_helm_dependency_update"></a> [helm\_dependency\_update](#input\_helm\_dependency\_update) | Runs helm dependency update before installing the chart | `bool` | `false` | no |
