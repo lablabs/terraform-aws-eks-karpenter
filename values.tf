@@ -1,11 +1,9 @@
 locals {
   values_default = yamlencode({
     settings = {
-      aws = {
-        clusterEndpoint       = one(data.aws_eks_cluster.this[*].endpoint)
-        clusterName           = var.cluster_name
-        interruptionQueueName = one(aws_sqs_queue.this[*].name)
-      }
+      clusterEndpoint   = one(data.aws_eks_cluster.this[*].endpoint)
+      clusterName       = var.cluster_name
+      interruptionQueue = one(aws_sqs_queue.this[*].name)
     }
     serviceAccount = {
       create = var.service_account_create
