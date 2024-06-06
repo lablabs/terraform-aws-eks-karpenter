@@ -7,7 +7,7 @@ We help companies build, run, deploy and scale software and infrastructure by em
 ---
 
 [![Terraform validate](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/validate.yaml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/validate.yaml)
-[![pre-commit](https://github.com/lablabs/terraform-aws-karpenter/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/pre-commit.yml)
+[![pre-commit](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/pre-commit.yml)
 
 ## Description
 
