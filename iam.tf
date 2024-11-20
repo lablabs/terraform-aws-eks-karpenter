@@ -145,11 +145,29 @@ data "aws_iam_policy_document" "this" {
       values   = ["*"]
     }
 
+    condition { # Karpenter v1 Migration: Include additional tag-scoping for the eks:eks-cluster-name tag - https://karpenter.sh/docs/reference/cloudformation/#allowscopedresourcetagging
+      test     = "StringEquals"
+      variable = "aws:RequestTag/eks:eks-cluster-name"
+
+      values = [
+        var.cluster_name
+      ]
+    }
+
+    condition { # Karpenter v1 Migration: Include additional tag-scoping for the eks:eks-cluster-name tag - https://karpenter.sh/docs/reference/cloudformation/#allowscopedresourcetagging
+      test     = "StringEqualsIfExists"
+      variable = "aws:RequestTag/eks:eks-cluster-name"
+      values = [
+        var.cluster_name
+      ]
+    }
+
     condition {
       test     = "ForAllValues:StringEquals"
       variable = "aws:TagKeys"
 
       values = [
+        "eks:eks-cluster-name",
         "karpenter.sh/nodeclaim",
         "Name",
       ]
