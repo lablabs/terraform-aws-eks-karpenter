@@ -82,6 +82,14 @@ data "aws_iam_policy_document" "this" {
     }
 
     condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/eks:eks-cluster-name"
+      values   = [
+        var.cluster_name
+      ]
+    }
+
+    condition {
       test     = "StringLike"
       variable = "aws:RequestTag/karpenter.sh/nodepool"
       values   = ["*"]
@@ -207,7 +215,7 @@ data "aws_iam_policy_document" "this" {
     resources = ["*"]
 
     actions = [
-      "ec2:DescribeAvailabilityZones",
+      "ec2:DescribeAvailabilityZones", # Missing in the example but its there in description: https://karpenter.sh/docs/reference/cloudformation/#allowregionalreadactions
       "ec2:DescribeImages",
       "ec2:DescribeInstances",
       "ec2:DescribeInstanceTypeOfferings",
@@ -260,20 +268,28 @@ data "aws_iam_policy_document" "this" {
     condition {
       test     = "StringEquals"
       variable = "iam:PassedToService"
-      values   = ["ec2.amazonaws.com"]
+      values   = ["ec2.amazonaws.com", "ec2.amazonaws.com.cn"]
     }
   }
 
   statement {
     sid       = "AllowScopedInstanceProfileCreationActions"
     effect    = "Allow"
-    resources = ["*"]
+    resources = ["arn:${var.aws_partition}:iam::${data.aws_caller_identity.this[0].account_id}:instance-profile/*"]
     actions   = ["iam:CreateInstanceProfile"]
 
     condition {
       test     = "StringEquals"
       variable = "aws:RequestTag/kubernetes.io/cluster/${var.cluster_name}"
       values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/eks:eks-cluster-name"
+      values   = [
+        var.cluster_name
+      ]
     }
 
     condition {
@@ -292,7 +308,7 @@ data "aws_iam_policy_document" "this" {
   statement {
     sid       = "AllowScopedInstanceProfileTagActions"
     effect    = "Allow"
-    resources = ["*"]
+    resources = ["arn:${var.aws_partition}:iam::${data.aws_caller_identity.this[0].account_id}:instance-profile/*"]
     actions   = ["iam:TagInstanceProfile"]
 
     condition {
@@ -315,8 +331,10 @@ data "aws_iam_policy_document" "this" {
 
     condition {
       test     = "StringEquals"
-      variable = "aws:RequestTag/topology.kubernetes.io/region"
-      values   = [data.aws_region.this[0].name]
+      variable = "aws:RequestTag/eks:eks-cluster-name"
+      values   = [
+        var.cluster_name
+      ]
     }
 
     condition {
@@ -365,7 +383,7 @@ data "aws_iam_policy_document" "this" {
   statement {
     sid       = "AllowInstanceProfileReadActions"
     effect    = "Allow"
-    resources = ["*"]
+    resources = ["arn:${var.aws_partition}:iam::${data.aws_caller_identity.this[0].account_id}:instance-profile/*"]
     actions   = ["iam:GetInstanceProfile"]
   }
 
