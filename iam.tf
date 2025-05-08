@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "this" {
   #checkov:skip=CKV_AWS_356: Describe need to be allowed on all resources
   count = local.irsa_role_create && var.irsa_policy_enabled && !var.irsa_assume_role_enabled ? 1 : 0
 
-  # Aligned with https://github.com/aws/karpenter-provider-aws/blob/v0.36.1/website/content/en/preview/getting-started/getting-started-with-karpenter/cloudformation.yaml
+  # Aligned with https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v1.4/getting-started/getting-started-with-karpenter/cloudformation.yaml
   statement {
     sid    = "AllowScopedEC2InstanceAccessActions"
     effect = "Allow"
