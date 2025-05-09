@@ -338,6 +338,12 @@ data "aws_iam_policy_document" "this" {
     }
 
     condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/topology.kubernetes.io/region"
+      values   = [data.aws_region.this[0].name]
+    }
+
+    condition {
       test     = "StringLike"
       variable = "aws:ResourceTag/karpenter.k8s.aws/ec2nodeclass"
       values   = ["*"]
