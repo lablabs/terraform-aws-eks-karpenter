@@ -1,20 +1,3 @@
-data "aws_iam_policy_document" "karpenter_node_assume_policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-    effect = "Allow"
-  }
-}
-
-resource "aws_iam_role" "this" {
-  name               = "karpenter-node-role"
-  assume_role_policy = data.aws_iam_policy_document.karpenter_node_assume_policy.json
-}
-
 module "addon_installation_disabled" {
   source = "../../"
 
@@ -22,8 +5,6 @@ module "addon_installation_disabled" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
-  cluster_name                     = module.eks_cluster.eks_cluster_id
-  karpenter_node_role_arns         = aws_iam_role.this.arn
 }
 
 module "addon_installation_helm" {
@@ -35,8 +16,23 @@ module "addon_installation_helm" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
-  cluster_name                     = module.eks_cluster.eks_cluster_id
-  karpenter_node_role_arns         = aws_iam_role.this.arn
+
+  values = yamlencode({
+    # insert sample values here
+  })
+}
+
+module "addon_installation_helm_pod_identity" {
+  source = "../../"
+
+  enabled           = true
+  argo_enabled      = false
+  argo_helm_enabled = false
+
+  cluster_name = module.eks_cluster.eks_cluster_id
+
+  irsa_role_create         = false
+  pod_identity_role_create = true
 
   values = yamlencode({
     # insert sample values here
@@ -53,19 +49,16 @@ module "addon_installation_argo_kubernetes" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
-  cluster_name                     = module.eks_cluster.eks_cluster_id
-  karpenter_node_role_arns         = aws_iam_role.this.arn
 
   values = yamlencode({
     # insert sample values here
   })
 
   argo_sync_policy = {
-    "automated" : {}
-    "syncOptions" = ["CreateNamespace=true"]
+    automated   = {}
+    syncOptions = ["CreateNamespace=true"]
   }
 }
-
 
 module "addon_installation_argo_helm" {
   source = "../../"
@@ -76,10 +69,13 @@ module "addon_installation_argo_helm" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
-  cluster_name                     = module.eks_cluster.eks_cluster_id
-  karpenter_node_role_arns         = aws_iam_role.this.arn
+
+  values = yamlencode({
+    # insert sample values here
+  })
+
   argo_sync_policy = {
-    "automated" : {}
-    "syncOptions" = ["CreateNamespace=true"]
+    automated   = {}
+    syncOptions = ["CreateNamespace=true"]
   }
 }
