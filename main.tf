@@ -12,14 +12,14 @@ locals {
 
     helm_chart_name       = "karpenter-crd"
     helm_chart_version    = "1.4.0"
-    helm_repo_url         = "public.ecr.aws"
+    helm_repo_url         = "oci://public.ecr.aws/karpenter"
     helm_create_namespace = false # CRDs are cluster-wide resources
 
     argo_sync_policy = {
       automated = {}
-      syncOptions = [
-        "ServerSideApply=true"
-      ]
+      # syncOptions = [
+      #   "ServerSideApply=true"
+      # ]
     }
 
     argo_kubernetes_manifest_wait_fields = {
@@ -34,7 +34,7 @@ locals {
     name = "karpenter"
 
     helm_chart_version = "1.4.0"
-    helm_repo_url      = "public.ecr.aws"
+    helm_repo_url      = "oci://public.ecr.aws/karpenter"
   }
 
   addon_irsa = {
