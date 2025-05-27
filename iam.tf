@@ -1,5 +1,5 @@
 locals {
-  irsa_role_create = var.enabled && var.rbac_create && var.service_account_create && var.irsa_role_create
+  irsa_policy_enabled = var.irsa_policy_enabled != null ? var.irsa_policy_enabled : coalesce(var.irsa_assume_role_enabled, false) == false
 }
 
 data "aws_region" "this" {
@@ -13,7 +13,7 @@ data "aws_caller_identity" "this" {
 data "aws_iam_policy_document" "this" {
   #checkov:skip=CKV_AWS_111: In the future, we may further lock down ec2:RunInstances by using tags in related resources.
   #checkov:skip=CKV_AWS_356: Describe need to be allowed on all resources
-  count = local.irsa_role_create && var.irsa_policy_enabled && !var.irsa_assume_role_enabled ? 1 : 0
+  count = var.enabled && var.irsa_policy == null && local.irsa_policy_enabled ? 1 : 0
 
   # Aligned with https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v1.4/getting-started/getting-started-with-karpenter/cloudformation.yaml
   statement {
@@ -399,74 +399,4 @@ data "aws_iam_policy_document" "this" {
     resources = ["arn:${var.aws_partition}:eks:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:cluster/${var.cluster_name}"]
     actions   = ["eks:DescribeCluster"]
   }
-}
-
-data "aws_iam_policy_document" "this_assume" {
-  count = local.irsa_role_create && var.irsa_assume_role_enabled ? 1 : 0
-
-  statement {
-    sid    = "AllowAssumeKarpenterRole"
-    effect = "Allow"
-    actions = [
-      "sts:AssumeRole"
-    ]
-    resources = [
-      var.irsa_assume_role_arn
-    ]
-  }
-}
-
-resource "aws_iam_policy" "this" {
-  count = local.irsa_role_create && (var.irsa_policy_enabled || var.irsa_assume_role_enabled) ? 1 : 0
-
-  name        = "${var.irsa_role_name_prefix}-${var.helm_chart_name}"
-  path        = "/"
-  description = "Policy for Karpenter service"
-  policy      = var.irsa_assume_role_enabled ? data.aws_iam_policy_document.this_assume[0].json : data.aws_iam_policy_document.this[0].json
-
-  tags = var.irsa_tags
-}
-
-data "aws_iam_policy_document" "this_irsa" {
-  count = local.irsa_role_create ? 1 : 0
-
-  statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-
-    principals {
-      type        = "Federated"
-      identifiers = [var.cluster_identity_oidc_issuer_arn]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "${replace(var.cluster_identity_oidc_issuer, "https://", "")}:sub"
-
-      values = [
-        "system:serviceaccount:${var.namespace}:${var.service_account_name}",
-      ]
-    }
-
-    effect = "Allow"
-  }
-}
-
-resource "aws_iam_role" "this" {
-  count              = local.irsa_role_create ? 1 : 0
-  name               = "${var.irsa_role_name_prefix}-${var.helm_chart_name}"
-  assume_role_policy = data.aws_iam_policy_document.this_irsa[0].json
-  tags               = var.irsa_tags
-}
-
-resource "aws_iam_role_policy_attachment" "this" {
-  count      = local.irsa_role_create && var.irsa_policy_enabled ? 1 : 0
-  role       = aws_iam_role.this[0].name
-  policy_arn = aws_iam_policy.this[0].arn
-}
-
-resource "aws_iam_role_policy_attachment" "this_additional" {
-  for_each = local.irsa_role_create ? var.irsa_additional_policies : {}
-
-  role       = aws_iam_role.this[0].name
-  policy_arn = each.value
 }
