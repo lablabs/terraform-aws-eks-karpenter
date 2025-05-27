@@ -2,14 +2,10 @@ locals {
   aws_partition_dns_suffix = data.aws_partition.current[0].dns_suffix
 }
 
-data "aws_partition" "current" {
-  count = var.enabled ? 1 : 0
-}
-
 resource "aws_sqs_queue" "this" {
   count = var.enabled ? 1 : 0
   #checkov:skip=CKV_AWS_27:Nothing sensitive
-  name                      = "${var.queue_interruption_prefix}-${var.helm_chart_name}"
+  name                      = "${var.queue_interruption_prefix}-${local.addon.name}"
   message_retention_seconds = 300
   tags                      = var.irsa_tags
 }
@@ -86,7 +82,6 @@ resource "aws_cloudwatch_event_rule" "this" {
   event_pattern = jsonencode(each.value.event_pattern)
 
   tags = var.irsa_tags
-
 }
 
 resource "aws_cloudwatch_event_target" "this" {
