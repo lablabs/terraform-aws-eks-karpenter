@@ -1,16 +1,11 @@
 locals {
-  helm_chart_name          = var.helm_chart_name != null ? var.helm_chart_name : local.addon.name
   aws_partition_dns_suffix = data.aws_partition.current[0].dns_suffix
-}
-
-data "aws_partition" "current" {
-  count = var.enabled ? 1 : 0
 }
 
 resource "aws_sqs_queue" "this" {
   count = var.enabled ? 1 : 0
   #checkov:skip=CKV_AWS_27:Nothing sensitive
-  name                      = "${var.queue_interruption_prefix}-${local.helm_chart_name}"
+  name                      = "${var.queue_interruption_prefix}-${local.addon.name}"
   message_retention_seconds = 300
   tags                      = var.irsa_tags
 }

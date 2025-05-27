@@ -1,10 +1,10 @@
 /**
- * # AWS EKS Universal Addon Terraform module
+ * # AWS EKS Karpenter Terraform module
  *
- * A Terraform module to deploy the universal addon on Amazon EKS cluster.
+ * A terraform module to deploy the [Karpenter](https://karpenter.sh/) on Amazon EKS cluster.
  *
- * [![Terraform validate](https://github.com/lablabs/terraform-aws-eks-universal-addon/actions/workflows/validate.yaml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-universal-addon/actions/workflows/validate.yaml)
- * [![pre-commit](https://github.com/lablabs/terraform-aws-eks-universal-addon/actions/workflows/pre-commit.yaml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-universal-addon/actions/workflows/pre-commit.yaml)
+ * [![Terraform validate](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/validate.yaml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/validate.yaml)
+ * [![pre-commit](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/pre-commit.yml)
  */
 locals {
   crds = {
@@ -17,9 +17,9 @@ locals {
 
     argo_sync_policy = {
       automated = {}
-      # syncOptions = [
-      #   "ServerSideApply=true"
-      # ]
+      syncOptions = [
+        "ServerSideApply=true"
+      ]
     }
 
     argo_kubernetes_manifest_wait_fields = {
@@ -35,6 +35,7 @@ locals {
 
     helm_chart_version = "1.4.0"
     helm_repo_url      = "oci://public.ecr.aws/karpenter"
+    helm_skip_crds     = var.crds_enabled # CRDs are installed by the CRDs module, if enabled
   }
 
   addon_irsa = {
@@ -68,4 +69,8 @@ locals {
 data "aws_eks_cluster" "this" {
   count = var.enabled ? 1 : 0
   name  = var.cluster_name
+}
+
+data "aws_partition" "current" {
+  count = var.enabled ? 1 : 0
 }
