@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "this" {
   #checkov:skip=CKV_AWS_356: Describe need to be allowed on all resources
   count = var.enabled && var.irsa_policy == null && local.irsa_policy_enabled ? 1 : 0
 
-  # Aligned with https://github.com/aws/karpenter-provider-aws/blob/v0.36.1/website/content/en/preview/getting-started/getting-started-with-karpenter/cloudformation.yaml
+  # Aligned with https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v1.4/getting-started/getting-started-with-karpenter/cloudformation.yaml
   statement {
     sid    = "AllowScopedEC2InstanceAccessActions"
     effect = "Allow"
@@ -79,6 +79,14 @@ data "aws_iam_policy_document" "this" {
       test     = "StringEquals"
       variable = "aws:RequestTag/kubernetes.io/cluster/${var.cluster_name}"
       values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/eks:eks-cluster-name"
+      values = [
+        var.cluster_name
+      ]
     }
 
     condition {
@@ -207,7 +215,7 @@ data "aws_iam_policy_document" "this" {
     resources = ["*"]
 
     actions = [
-      "ec2:DescribeAvailabilityZones",
+      "ec2:DescribeAvailabilityZones", # Missing in the example but its there in description: https://karpenter.sh/docs/reference/cloudformation/#allowregionalreadactions
       "ec2:DescribeImages",
       "ec2:DescribeInstances",
       "ec2:DescribeInstanceTypeOfferings",
@@ -260,20 +268,28 @@ data "aws_iam_policy_document" "this" {
     condition {
       test     = "StringEquals"
       variable = "iam:PassedToService"
-      values   = ["ec2.amazonaws.com"]
+      values   = ["ec2.amazonaws.com", "ec2.amazonaws.com.cn"]
     }
   }
 
   statement {
     sid       = "AllowScopedInstanceProfileCreationActions"
     effect    = "Allow"
-    resources = ["*"]
+    resources = ["arn:${var.aws_partition}:iam::${data.aws_caller_identity.this[0].account_id}:instance-profile/*"]
     actions   = ["iam:CreateInstanceProfile"]
 
     condition {
       test     = "StringEquals"
       variable = "aws:RequestTag/kubernetes.io/cluster/${var.cluster_name}"
       values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/eks:eks-cluster-name"
+      values = [
+        var.cluster_name
+      ]
     }
 
     condition {
@@ -292,7 +308,7 @@ data "aws_iam_policy_document" "this" {
   statement {
     sid       = "AllowScopedInstanceProfileTagActions"
     effect    = "Allow"
-    resources = ["*"]
+    resources = ["arn:${var.aws_partition}:iam::${data.aws_caller_identity.this[0].account_id}:instance-profile/*"]
     actions   = ["iam:TagInstanceProfile"]
 
     condition {
@@ -311,6 +327,14 @@ data "aws_iam_policy_document" "this" {
       test     = "StringEquals"
       variable = "aws:RequestTag/kubernetes.io/cluster/${var.cluster_name}"
       values   = ["owned"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/eks:eks-cluster-name"
+      values = [
+        var.cluster_name
+      ]
     }
 
     condition {
@@ -365,7 +389,7 @@ data "aws_iam_policy_document" "this" {
   statement {
     sid       = "AllowInstanceProfileReadActions"
     effect    = "Allow"
-    resources = ["*"]
+    resources = ["arn:${var.aws_partition}:iam::${data.aws_caller_identity.this[0].account_id}:instance-profile/*"]
     actions   = ["iam:GetInstanceProfile"]
   }
 
