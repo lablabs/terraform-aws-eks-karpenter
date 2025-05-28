@@ -16,7 +16,7 @@ module "crds" {
   enabled = local.crds_enabled
 
   # variable priority var.crds_* (provided by the module user) > local.crds.* (universal addon default override) > default (universal addon default)
-  namespace = local.addon_namespace # CRDs are cluster-wide resources, but for a Helm release we need a namespace to be the same as the
+  namespace = local.addon_namespace # CRDs are cluster-wide resources, but for a Helm release we need a namespace to be the same as the addon itself
 
   helm_enabled                    = var.crds_helm_enabled != null ? var.crds_helm_enabled : try(local.crds.helm_enabled, null)
   helm_release_name               = local.crds_name
