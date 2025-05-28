@@ -17,9 +17,6 @@ locals {
 
     argo_sync_policy = {
       automated = {}
-      syncOptions = [
-        "ServerSideApply=true"
-      ]
     }
 
     argo_kubernetes_manifest_wait_fields = {
