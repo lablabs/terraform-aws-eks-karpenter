@@ -7,12 +7,14 @@
  * [![pre-commit](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/pre-commit.yaml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-karpenter/actions/workflows/pre-commit.yaml)
  */
 locals {
+  helm_repo_url = var.argo_enabled == true ? "public.ecr.aws/karpenter" : "oci://public.ecr.aws/karpenter"
+
   crds = {
     name = "karpenter-crds"
 
     helm_chart_name       = "karpenter-crd"
     helm_chart_version    = "1.4.0"
-    helm_repo_url         = "oci://public.ecr.aws/karpenter"
+    helm_repo_url         = local.helm_repo_url
     helm_create_namespace = false # CRDs are cluster-wide resources
 
     argo_sync_policy = {
@@ -31,7 +33,7 @@ locals {
     name = "karpenter"
 
     helm_chart_version = "1.4.0"
-    helm_repo_url      = "oci://public.ecr.aws/karpenter"
+    helm_repo_url      = local.helm_repo_url
     helm_skip_crds     = var.crds_enabled # CRDs are installed by the CRDs module, if enabled
   }
 
