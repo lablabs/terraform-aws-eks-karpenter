@@ -17,10 +17,6 @@ locals {
     helm_repo_url         = local.helm_repo_url
     helm_create_namespace = false # CRDs are cluster-wide resources
 
-    argo_sync_policy = {
-      automated = {}
-    }
-
     argo_kubernetes_manifest_wait_fields = {
       "status.sync.status"   = "Synced"
       "status.health.status" = "Healthy"
