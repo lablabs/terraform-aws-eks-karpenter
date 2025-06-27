@@ -49,7 +49,7 @@ variable "crds_values" {
 variable "crds_argo_name" {
   type        = string
   default     = null
-  description = "Name of the ArgoCD Application. Required if `crds_argo_source_type` is set to `kustomize` or `directory`.  If `crds_argo_source_type` is set to `helm`, ArgoCD Application name will equal `helm_release_name`. Defaults to `\"\"`."
+  description = "Name of the ArgoCD Application. Required if `crds_argo_source_type` is set to `kustomize` or `directory`.  If `crds_argo_source_type` is set to `helm`, ArgoCD Application name will equal `crds_helm_release_name`. Defaults to `\"\"`."
 }
 
 variable "crds_argo_namespace" {
