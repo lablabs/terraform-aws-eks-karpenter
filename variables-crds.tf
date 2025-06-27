@@ -7,25 +7,25 @@ variable "crds_helm_enabled" {
 variable "crds_helm_chart_name" {
   type        = string
   default     = null
-  description = "Helm chart name to be installed. Required if `argo_source_type` is set to `helm`. Defaults to `null`."
+  description = "Helm chart name to be installed. Required if `crds_argo_source_type` is set to `helm`. Defaults to `\"\"`."
 }
 
 variable "crds_helm_chart_version" {
   type        = string
   default     = null
-  description = "Version of the Helm chart. Required if `argo_source_type` is set to `helm`. Defaults to `null`."
+  description = "Version of the Helm chart. Required if `crds_argo_source_type` is set to `helm`. Defaults to `\"\"`."
 }
 
 variable "crds_helm_release_name" {
   type        = string
   default     = null
-  description = "Helm release name. Required if `argo_source_type` is set to `helm`. Defaults to `null`."
+  description = "Helm release name. Required if `crds_argo_source_type` is set to `helm`. Defaults to `\"\"`."
 }
 
 variable "crds_helm_repo_url" {
   type        = string
   default     = null
-  description = "Helm repository. Required if `argo_source_type` is set to `helm`. Defaults to `null`."
+  description = "Helm repository. Required if `crds_argo_source_type` is set to `helm`. Defaults to `\"\"`."
 }
 
 variable "crds_helm_create_namespace" {
@@ -49,7 +49,7 @@ variable "crds_values" {
 variable "crds_argo_name" {
   type        = string
   default     = null
-  description = "Name of the ArgoCD Application. Required if `argo_source_type` is set to `kustomize` or `directory`.  If `argo_source_type` is set to `helm`, ArgoCD Application name will equal `helm_release_name`. Defaults to `null`."
+  description = "Name of the ArgoCD Application. Required if `crds_argo_source_type` is set to `kustomize` or `directory`.  If `crds_argo_source_type` is set to `helm`, ArgoCD Application name will equal `helm_release_name`. Defaults to `\"\"`."
 }
 
 variable "crds_argo_namespace" {
@@ -97,31 +97,31 @@ variable "crds_argo_helm_wait_backoff_limit" {
 variable "crds_argo_helm_wait_kubectl_version" {
   type        = string
   default     = null
-  description = "Version of kubectl to use for ArgoCD Application wait job. Defaults to `1.32.3`."
+  description = "Version of kubectl to use for ArgoCD Application wait job. Defaults to `1.33.0`."
 }
 
 variable "crds_argo_source_type" {
   type        = string
   default     = null
-  description = "Source type for ArgoCD Application. Can be either `helm`, `kustomize`, or `directory`. Defaults to `helm`."
+  description = "Source type for ArgoCD Application. Can be either `helm`, `kustomize`, `directory` or `helm-directory`. Defaults to `helm`."
 }
 
 variable "crds_argo_source_repo_url" {
   type        = string
   default     = null
-  description = "ArgoCD Application source repo URL. Required if `argo_source_type` is set to `kustomize` or `directory`. Defaults to `null`."
+  description = "ArgoCD Application source repo URL. Required if `crds_argo_source_type` is set to `kustomize` or `directory`. Defaults to `\"\"`."
 }
 
 variable "crds_argo_source_target_revision" {
   type        = string
   default     = null
-  description = "ArgoCD Application source target revision. Required if `argo_source_type` is set to `kustomize` or `directory`. Defaults to `null`."
+  description = "ArgoCD Application source target revision. Required if `crds_argo_source_type` is set to `kustomize` or `directory`. Defaults to `\"\"`."
 }
 
 variable "crds_argo_source_path" {
   type        = string
   default     = null
-  description = "ArgoCD Application source path. Required if `argo_source_type` is set to `kustomize` or `directory`. Defaults to `null`."
+  description = "ArgoCD Application source path. Required if `crds_argo_source_type` is set to `kustomize` or `directory`. Defaults to `\"\"`."
 }
 
 variable "crds_argo_destination_server" {
@@ -139,7 +139,7 @@ variable "crds_argo_project" {
 variable "crds_argo_info" {
   type        = list(any)
   default     = null
-  description = "ArgoCD Application manifest info parameter. Defaults to `[{\"name\": \"terraform\", \"value\": \"true\"}]`."
+  description = "ArgoCD Application manifest info parameter. Defaults to `[{ name = \"terraform\", value = \"true\" }]`."
 }
 
 variable "crds_argo_sync_policy" {
@@ -151,7 +151,7 @@ variable "crds_argo_sync_policy" {
 variable "crds_argo_metadata" {
   type        = any
   default     = null
-  description = "ArgoCD Application metadata configuration. Override or create additional metadata parameters. Defaults to `{\"finalizers\": [\"resources-finalizer.argocd.argoproj.io\"]}`."
+  description = "ArgoCD Application metadata configuration. Override or create additional metadata parameters. Defaults to `{ finalizers = [\"resources-finalizer.argocd.argoproj.io\"] }`."
 }
 
 variable "crds_argo_apiversion" {
@@ -187,7 +187,7 @@ variable "crds_argo_helm_values" {
 variable "crds_argo_kubernetes_manifest_computed_fields" {
   type        = list(string)
   default     = null
-  description = "List of paths of fields to be handled as \"computed\". The user-configured value for the field will be overridden by any different value returned by the API after apply. Defaults to `[\"metadata.labels\", \"metadata.annotations\", \"metadata.finalizers\"]`."
+  description = "List of paths of fields to be handled as `computed`. The user-configured value for the field will be overridden by any different value returned by the API after apply. Defaults to `[\"metadata.labels\", \"metadata.annotations\", \"metadata.finalizers\"]`."
 }
 
 variable "crds_argo_kubernetes_manifest_field_manager_name" {
