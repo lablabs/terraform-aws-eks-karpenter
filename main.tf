@@ -57,8 +57,16 @@ locals {
   })
 
   addon_depends_on = [
-    module.crds
+    module.crds,
   ]
+}
+
+data "aws_region" "this" {
+  count = var.enabled ? 1 : 0
+}
+
+data "aws_caller_identity" "this" {
+  count = var.enabled ? 1 : 0
 }
 
 data "aws_eks_cluster" "this" {
@@ -66,6 +74,6 @@ data "aws_eks_cluster" "this" {
   name  = var.cluster_name
 }
 
-data "aws_partition" "current" {
+data "aws_partition" "this" {
   count = var.enabled ? 1 : 0
 }

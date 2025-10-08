@@ -2,14 +2,6 @@ locals {
   irsa_policy_enabled = var.irsa_policy_enabled != null ? var.irsa_policy_enabled : coalesce(var.irsa_assume_role_enabled, false) == false
 }
 
-data "aws_region" "this" {
-  count = var.enabled ? 1 : 0
-}
-
-data "aws_caller_identity" "this" {
-  count = var.enabled ? 1 : 0
-}
-
 data "aws_iam_policy_document" "this" {
   #checkov:skip=CKV_AWS_111: In the future, we may further lock down ec2:RunInstances by using tags in related resources.
   #checkov:skip=CKV_AWS_356: Describe need to be allowed on all resources

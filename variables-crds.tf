@@ -1,3 +1,9 @@
+variable "crds_depends_on" {
+  type        = list(any)
+  default     = []
+  description = "List of resources to wait for before installing the CRDs. Typically used to force a dependency on another addon."
+}
+
 variable "crds_helm_enabled" {
   type        = bool
   default     = null

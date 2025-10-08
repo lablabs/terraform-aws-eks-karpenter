@@ -1,5 +1,5 @@
 locals {
-  aws_partition_dns_suffix = data.aws_partition.current[0].dns_suffix
+  aws_partition_dns_suffix = one(data.aws_partition.this[*].dns_suffix)
 }
 
 resource "aws_sqs_queue" "this" {
@@ -25,7 +25,6 @@ data "aws_iam_policy_document" "queue" {
         "sqs.${local.aws_partition_dns_suffix}",
       ]
     }
-
   }
 }
 
