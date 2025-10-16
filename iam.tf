@@ -392,7 +392,8 @@ data "aws_iam_policy_document" "this" {
     resources = ["arn:${var.aws_partition}:iam::${data.aws_caller_identity.this[0].account_id}:instance-profile/*"]
     actions   = ["iam:GetInstanceProfile"]
   }
-
+  # Required IAM permission for Karpenter v1.7.0 and later to manage EC2 instance profiles:
+  # See: https://karpenter.sh/docs/upgrading/upgrade-guide/#upgrading-to-170
   statement {
     sid       = "AllowInstanceProfileListActions"
     effect    = "Allow"
