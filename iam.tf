@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "this" {
   #checkov:skip=CKV_AWS_356: Describe need to be allowed on all resources
   count = var.enabled && var.irsa_policy == null && local.irsa_policy_enabled ? 1 : 0
 
-  # Aligned with https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v1.4/getting-started/getting-started-with-karpenter/cloudformation.yaml
+  # Aligned with https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v1.7/getting-started/getting-started-with-karpenter/cloudformation.yaml
   statement {
     sid    = "AllowScopedEC2InstanceAccessActions"
     effect = "Allow"
@@ -391,6 +391,14 @@ data "aws_iam_policy_document" "this" {
     effect    = "Allow"
     resources = ["arn:${var.aws_partition}:iam::${data.aws_caller_identity.this[0].account_id}:instance-profile/*"]
     actions   = ["iam:GetInstanceProfile"]
+  }
+  # Required IAM permission for Karpenter v1.7.0 and later to manage EC2 instance profiles:
+  # See: https://karpenter.sh/docs/upgrading/upgrade-guide/#upgrading-to-170
+  statement {
+    sid       = "AllowUnscopedInstanceProfileListAction"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["iam:ListInstanceProfiles"]
   }
 
   statement {
