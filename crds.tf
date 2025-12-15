@@ -11,7 +11,7 @@ locals {
 }
 
 module "crds" {
-  source = "git::https://github.com/lablabs/terraform-aws-eks-universal-addon.git//modules/addon?ref=v0.0.24"
+  source = "git::https://github.com/lablabs/terraform-aws-eks-universal-addon.git//modules/addon?ref=feat/data-source-inline"
 
   enabled = local.crds_enabled
 
@@ -84,6 +84,10 @@ module "crds" {
 
   settings = var.crds_settings != null ? var.crds_settings : lookup(local.crds, "settings", null)
   values   = one(data.utils_deep_merge_yaml.crds_values[*].output)
+
+  depends_on = [
+    var.crds_depends_on
+  ]
 }
 
 data "utils_deep_merge_yaml" "crds_values" {
