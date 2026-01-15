@@ -383,8 +383,7 @@ variable "crds_helm_postrender" {
 }
 
 variable "crds_depends_on" {
-  type        = list(any)
-  default     = []
+  type        = any
+  default     = null
   description = "List of resources to wait for before installing the CRD resources. Typically used to force a dependency on another addon."
-  nullable    = false
 }
