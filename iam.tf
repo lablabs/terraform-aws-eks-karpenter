@@ -11,7 +11,7 @@ locals {
 #  Policies are split into multiple policies based on https://karpenter.sh/docs/reference/cloudformation/#controller-authorization due to managed policy length limit of 6,144 characters.
 data "aws_iam_policy_document" "node_lifecycle" {
   #checkov:skip=CKV_AWS_111: In the future, we may further lock down ec2:RunInstances by using tags in related resources.
-  count = var.enabled && var.irsa_policy == null && local.irsa_policy_enabled ? 1 : 0
+  count = local.irsa_policy_enabled ? 1 : 0
 
   statement {
     sid    = "AllowScopedEC2InstanceAccessActions"
