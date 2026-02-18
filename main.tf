@@ -13,7 +13,7 @@ locals {
     name = "karpenter-crds"
 
     helm_chart_name       = "karpenter-crd"
-    helm_chart_version    = "1.8.1"
+    helm_chart_version    = "1.8.6"
     helm_repo_url         = local.helm_repo_url
     helm_create_namespace = false # CRDs are cluster-wide resources
 
@@ -28,16 +28,13 @@ locals {
   addon = {
     name = "karpenter"
 
-    helm_chart_version = "1.8.1"
+    helm_chart_version = "1.8.6"
     helm_repo_url      = local.helm_repo_url
     helm_skip_crds     = var.crds_enabled # CRDs are installed by the CRDs module, if enabled
   }
 
   addon_irsa = {
-    (local.addon.name) = {
-      irsa_policy_enabled = local.irsa_policy_enabled
-      irsa_policy         = var.irsa_policy != null ? var.irsa_policy : try(data.aws_iam_policy_document.this[0].json, "")
-    }
+    (local.addon.name) = {}
   }
 
   addon_values = yamlencode({
@@ -66,6 +63,14 @@ data "aws_eks_cluster" "this" {
   name  = var.cluster_name
 }
 
-data "aws_partition" "current" {
+data "aws_partition" "this" {
+  count = var.enabled ? 1 : 0
+}
+
+data "aws_region" "this" {
+  count = var.enabled ? 1 : 0
+}
+
+data "aws_caller_identity" "this" {
   count = var.enabled ? 1 : 0
 }
