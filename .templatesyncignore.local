@@ -1,0 +1,6 @@
+crds.tf
+iam.tf
+interruption.tf
+variables-crds.tf
+addon-oidc.tf
+variables-addon-oidc.tf
