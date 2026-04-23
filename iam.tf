@@ -18,11 +18,11 @@ data "aws_iam_policy_document" "node_lifecycle" {
     effect = "Allow"
 
     resources = [
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}::image/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}::snapshot/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:security-group/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:subnet/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:capacity-reservation/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}::image/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}::snapshot/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:security-group/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:subnet/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:capacity-reservation/*",
     ]
 
     actions = [
@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "node_lifecycle" {
   statement {
     sid       = "AllowScopedEC2LaunchTemplateAccessActions"
     effect    = "Allow"
-    resources = ["arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*"]
+    resources = ["arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:launch-template/*"]
 
     actions = [
       "ec2:RunInstances",
@@ -59,13 +59,13 @@ data "aws_iam_policy_document" "node_lifecycle" {
     effect = "Allow"
 
     resources = [
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:fleet/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:instance/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:volume/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:network-interface/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:spot-instances-request/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:capacity-reservation/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:fleet/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:instance/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:volume/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:network-interface/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:launch-template/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:spot-instances-request/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:capacity-reservation/*",
     ]
 
     actions = [
@@ -100,12 +100,12 @@ data "aws_iam_policy_document" "node_lifecycle" {
     effect = "Allow"
 
     resources = [
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:fleet/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:instance/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:volume/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:network-interface/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:spot-instances-request/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:fleet/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:instance/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:volume/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:network-interface/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:launch-template/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:spot-instances-request/*",
     ]
 
     actions = ["ec2:CreateTags"]
@@ -146,7 +146,7 @@ data "aws_iam_policy_document" "node_lifecycle" {
   statement {
     sid       = "AllowScopedResourceTagging"
     effect    = "Allow"
-    resources = ["arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:instance/*"]
+    resources = ["arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:instance/*"]
     actions   = ["ec2:CreateTags"]
 
     condition {
@@ -187,8 +187,8 @@ data "aws_iam_policy_document" "node_lifecycle" {
     effect = "Allow"
 
     resources = [
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:instance/*",
-      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].name}:*:launch-template/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:instance/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:launch-template/*",
     ]
 
     actions = [
@@ -249,7 +249,7 @@ data "aws_iam_policy_document" "iam_integration" {
     condition {
       test     = "StringEquals"
       variable = "aws:RequestTag/topology.kubernetes.io/region"
-      values   = [data.aws_region.this[0].name]
+      values   = [data.aws_region.this[0].id]
     }
 
     condition {
@@ -274,7 +274,7 @@ data "aws_iam_policy_document" "iam_integration" {
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceTag/topology.kubernetes.io/region"
-      values   = [data.aws_region.this[0].name]
+      values   = [data.aws_region.this[0].id]
     }
 
     condition {
@@ -294,7 +294,7 @@ data "aws_iam_policy_document" "iam_integration" {
     condition {
       test     = "StringEquals"
       variable = "aws:RequestTag/topology.kubernetes.io/region"
-      values   = [data.aws_region.this[0].name]
+      values   = [data.aws_region.this[0].id]
     }
 
     condition {
@@ -330,7 +330,7 @@ data "aws_iam_policy_document" "iam_integration" {
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceTag/topology.kubernetes.io/region"
-      values   = [data.aws_region.this[0].name]
+      values   = [data.aws_region.this[0].id]
     }
 
     condition {
@@ -347,7 +347,7 @@ data "aws_iam_policy_document" "eks_integration" {
   statement {
     sid       = "AllowAPIServerEndpointDiscovery"
     effect    = "Allow"
-    resources = ["arn:${var.aws_partition}:eks:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:cluster/${var.cluster_name}"]
+    resources = ["arn:${var.aws_partition}:eks:${data.aws_region.this[0].id}:${data.aws_caller_identity.this[0].account_id}:cluster/${var.cluster_name}"]
     actions   = ["eks:DescribeCluster"]
   }
 }
@@ -393,14 +393,14 @@ data "aws_iam_policy_document" "resource_discovery" {
     condition {
       test     = "StringEquals"
       variable = "aws:RequestedRegion"
-      values   = [data.aws_region.this[0].name]
+      values   = [data.aws_region.this[0].id]
     }
   }
 
   statement {
     sid       = "AllowSSMReadActions"
     effect    = "Allow"
-    resources = ["arn:${var.aws_partition}:ssm:${data.aws_region.this[0].name}::parameter/aws/service/*"]
+    resources = ["arn:${var.aws_partition}:ssm:${data.aws_region.this[0].id}::parameter/aws/service/*"]
     actions   = ["ssm:GetParameter"]
   }
 
