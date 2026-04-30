@@ -70,11 +70,13 @@ See [basic example](examples/basic) for further information.
 | [aws_iam_policy.interruption](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.node_lifecycle](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.resource_discovery](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.zonal_shift](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role_policy_attachment.eks_integration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.iam_integration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.interruption](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.node_lifecycle](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.resource_discovery](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.zonal_shift](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_sqs_queue.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue) | resource |
 | [aws_sqs_queue_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sqs_queue_policy) | resource |
 | [aws_caller_identity.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
@@ -85,6 +87,7 @@ See [basic example](examples/basic) for further information.
 | [aws_iam_policy_document.node_lifecycle](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.queue](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.resource_discovery](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.zonal_shift](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_partition.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 | [aws_region.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 | [utils_deep_merge_yaml.crds_values](https://registry.terraform.io/providers/cloudposse/utils/latest/docs/data-sources/deep_merge_yaml) | data source |
@@ -171,7 +174,7 @@ See [basic example](examples/basic) for further information.
 | <a name="input_crds_helm_keyring"></a> [crds\_helm\_keyring](#input\_crds\_helm\_keyring) | Location of public keys used for verification. Used only if `helm_package_verify` is `true`. Defaults to `~/.gnupg/pubring.gpg`. | `string` |
 | <a name="input_crds_helm_lint"></a> [crds\_helm\_lint](#input\_crds\_helm\_lint) | Run the Helm chart linter during the plan. Defaults to `false`. | `bool` |
 | <a name="input_crds_helm_package_verify"></a> [crds\_helm\_package\_verify](#input\_crds\_helm\_package\_verify) | Verify the package before installing it. Helm uses a provenance file to verify the integrity of the chart; this must be hosted alongside the chart. Defaults to `false`. | `bool` |
-| <a name="input_crds_helm_postrender"></a> [crds\_helm\_postrender](#input\_crds\_helm\_postrender) | Value block with a path to a binary file to run after Helm renders the manifest which can alter the manifest contents. Defaults to `null`. | <pre>object({<br/>    binary_path = string<br/>    args        = optional(list(string))<br/>  })</pre> |
+| <a name="input_crds_helm_postrender"></a> [crds\_helm\_postrender](#input\_crds\_helm\_postrender) | Value block with a path to a binary file to run after Helm renders the manifest which can alter the manifest contents. Defaults to `null`. | <pre>object({<br>    binary_path = string<br>    args        = optional(list(string))<br>  })</pre> |
 | <a name="input_crds_helm_recreate_pods"></a> [crds\_helm\_recreate\_pods](#input\_crds\_helm\_recreate\_pods) | Perform pods restart during Helm upgrade/rollback. Defaults to `false`. | `bool` |
 | <a name="input_crds_helm_release_max_history"></a> [crds\_helm\_release\_max\_history](#input\_crds\_helm\_release\_max\_history) | Maximum number of release versions stored per release. Defaults to `0`. | `number` |
 | <a name="input_crds_helm_release_name"></a> [crds\_helm\_release\_name](#input\_crds\_helm\_release\_name) | Helm release name. Required if `crds_argo_source_type` is set to `helm`. Defaults to `""`. | `string` |
@@ -208,7 +211,7 @@ See [basic example](examples/basic) for further information.
 | <a name="input_helm_keyring"></a> [helm\_keyring](#input\_helm\_keyring) | Location of public keys used for verification. Used only when `helm_package_verify` is `true`. Defaults to `~/.gnupg/pubring.gpg`. | `string` |
 | <a name="input_helm_lint"></a> [helm\_lint](#input\_helm\_lint) | Run the Helm chart linter during the plan. Defaults to `false`. | `bool` |
 | <a name="input_helm_package_verify"></a> [helm\_package\_verify](#input\_helm\_package\_verify) | Verify the package before installing it. Helm uses a provenance file to verify the integrity of the chart; this must be hosted alongside the chart. Defaults to `false`. | `bool` |
-| <a name="input_helm_postrender"></a> [helm\_postrender](#input\_helm\_postrender) | Value block with a path to a binary file to run after Helm renders the manifest which can alter the manifest contents. Defaults to `null`. | <pre>object({<br/>    binary_path = string<br/>    args        = optional(list(string))<br/>  })</pre> |
+| <a name="input_helm_postrender"></a> [helm\_postrender](#input\_helm\_postrender) | Value block with a path to a binary file to run after Helm renders the manifest which can alter the manifest contents. Defaults to `null`. | <pre>object({<br>    binary_path = string<br>    args        = optional(list(string))<br>  })</pre> |
 | <a name="input_helm_recreate_pods"></a> [helm\_recreate\_pods](#input\_helm\_recreate\_pods) | Perform pods restart during Helm upgrade/rollback. Defaults to `false`. | `bool` |
 | <a name="input_helm_release_max_history"></a> [helm\_release\_max\_history](#input\_helm\_release\_max\_history) | Maximum number of release versions stored per release. Defaults to `0`. | `number` |
 | <a name="input_helm_release_name"></a> [helm\_release\_name](#input\_helm\_release\_name) | Helm release name. Required if `argo_source_type` is set to `helm`. Defaults to `""`. | `string` |
