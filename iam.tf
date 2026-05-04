@@ -436,8 +436,14 @@ data "aws_iam_policy_document" "zonal_shift" {
   statement {
     sid       = "AllowZonalShiftStatusReadOnly"
     effect    = "Allow"
-    resources = ["arn:${var.aws_partition}:eks:${data.aws_region.this[0].id}:${data.aws_caller_identity.this[0].account_id}:cluster/${var.cluster_name}"]
+    resources = ["*"]
     actions   = ["arc-zonal-shift:GetManagedResource"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "arc-zonal-shift:ResourceIdentifier"
+      values   = ["arn:${var.aws_partition}:eks:${data.aws_region.this[0].id}:${data.aws_caller_identity.this[0].account_id}:cluster/${var.cluster_name}"]
+    }
   }
 }
 
