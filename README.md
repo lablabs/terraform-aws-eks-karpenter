@@ -58,7 +58,7 @@ See [basic example](examples/basic) for further information.
 |------|--------|---------|
 | <a name="module_addon"></a> [addon](#module\_addon) | git::https://github.com/lablabs/terraform-aws-eks-universal-addon.git//modules/addon | v1.0.0 |
 | <a name="module_addon-irsa"></a> [addon-irsa](#module\_addon-irsa) | git::https://github.com/lablabs/terraform-aws-eks-universal-addon.git//modules/addon-irsa | v1.0.0 |
-| <a name="module_crds"></a> [crds](#module\_crds) | git::https://github.com/lablabs/terraform-aws-eks-universal-addon.git//modules/addon | v1.0.0-rc2 |
+| <a name="module_crds"></a> [crds](#module\_crds) | git::https://github.com/lablabs/terraform-aws-eks-universal-addon.git//modules/addon | v1.0.0 |
 ## Resources
 
 | Name | Type |

@@ -11,7 +11,7 @@ locals {
 }
 
 module "crds" {
-  source = "git::https://github.com/lablabs/terraform-aws-eks-universal-addon.git//modules/addon?ref=v1.0.0-rc2"
+  source = "git::https://github.com/lablabs/terraform-aws-eks-universal-addon.git//modules/addon?ref=v1.0.0"
 
   enabled = local.crds_enabled
 
