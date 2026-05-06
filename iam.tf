@@ -23,6 +23,7 @@ data "aws_iam_policy_document" "node_lifecycle" {
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:security-group/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:subnet/*",
       "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:capacity-reservation/*",
+      "arn:${var.aws_partition}:ec2:${data.aws_region.this[0].id}:*:placement-group/*"
     ]
 
     actions = [
@@ -382,9 +383,11 @@ data "aws_iam_policy_document" "resource_discovery" {
       "ec2:DescribeAvailabilityZones", # Missing in the example but its there in description: https://karpenter.sh/docs/reference/cloudformation/#allowregionalreadactions
       "ec2:DescribeImages",
       "ec2:DescribeInstances",
+      "ec2:DescribeInstanceStatus",
       "ec2:DescribeInstanceTypeOfferings",
       "ec2:DescribeInstanceTypes",
       "ec2:DescribeLaunchTemplates",
+      "ec2:DescribePlacementGroups",
       "ec2:DescribeSecurityGroups",
       "ec2:DescribeSpotPriceHistory",
       "ec2:DescribeSubnets",
@@ -411,8 +414,6 @@ data "aws_iam_policy_document" "resource_discovery" {
     actions   = ["pricing:GetProducts"]
   }
 
-  # Required IAM permission for Karpenter v1.7.0 and later to manage EC2 instance profiles:
-  # See: https://karpenter.sh/docs/upgrading/upgrade-guide/#upgrading-to-170
   statement {
     sid       = "AllowUnscopedInstanceProfileListAction"
     effect    = "Allow"
@@ -425,6 +426,24 @@ data "aws_iam_policy_document" "resource_discovery" {
     effect    = "Allow"
     resources = ["arn:${var.aws_partition}:iam::${data.aws_caller_identity.this[0].account_id}:instance-profile/*"]
     actions   = ["iam:GetInstanceProfile"]
+  }
+}
+
+data "aws_iam_policy_document" "zonal_shift" {
+  #checkov:skip=CKV_AWS_356: Describe need to be allowed on all resources
+  count = local.irsa_policy_enabled ? 1 : 0
+
+  statement {
+    sid       = "AllowZonalShiftStatusReadOnly"
+    effect    = "Allow"
+    resources = ["*"]
+    actions   = ["arc-zonal-shift:GetManagedResource"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "arc-zonal-shift:ResourceIdentifier"
+      values   = ["arn:${var.aws_partition}:eks:${data.aws_region.this[0].id}:${data.aws_caller_identity.this[0].account_id}:cluster/${var.cluster_name}"]
+    }
   }
 }
 
@@ -516,4 +535,22 @@ resource "aws_iam_role_policy_attachment" "resource_discovery" {
 
   role       = module.addon-irsa[local.addon.name].irsa_iam_role_attributes.name
   policy_arn = aws_iam_policy.resource_discovery[0].arn
+}
+
+resource "aws_iam_policy" "zonal_shift" {
+  count = local.irsa_policy_enabled ? 1 : 0
+
+  description = "Zonal Shift policy for ${module.addon-irsa[local.addon.name].irsa_iam_role_attributes.name} addon"
+  name        = "${module.addon-irsa[local.addon.name].irsa_iam_role_attributes.name}-zonal-shift" # tflint-ignore: aws_iam_policy_invalid_name
+  path        = "/"
+  policy      = data.aws_iam_policy_document.zonal_shift[0].json
+
+  tags = var.irsa_tags
+}
+
+resource "aws_iam_role_policy_attachment" "zonal_shift" {
+  count = local.irsa_policy_enabled ? 1 : 0
+
+  role       = module.addon-irsa[local.addon.name].irsa_iam_role_attributes.name
+  policy_arn = aws_iam_policy.zonal_shift[0].arn
 }

@@ -28,7 +28,7 @@ locals {
   addon = {
     name = "karpenter"
 
-    helm_chart_version = "1.8.6"
+    helm_chart_version = "1.12.0"
     helm_repo_url      = local.helm_repo_url
     helm_skip_crds     = var.crds_enabled # CRDs are installed by the CRDs module, if enabled
   }
