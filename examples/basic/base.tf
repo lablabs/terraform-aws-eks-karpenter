@@ -15,7 +15,7 @@ module "eks_cluster" {
   source  = "cloudposse/eks-cluster/aws"
   version = "4.6.0"
 
-  kubernetes_version    = "1.35"
+  kubernetes_version    = "1.31"
   oidc_provider_enabled = true
 
   access_entry_map = {

@@ -83,20 +83,14 @@ module "crds" {
   argo_operation                                         = var.crds_argo_operation != null ? var.crds_argo_operation : lookup(local.crds, "argo_operation", null)
 
   settings = var.crds_settings != null ? var.crds_settings : lookup(local.crds, "settings", null)
-  values   = one(data.utils_deep_merge_yaml.crds_values[*].output)
+  values = local.crds_enabled ? provider::lara-utils::yaml_deep_merge(compact([
+    local.crds_values,
+    var.crds_values
+  ])) : null
 
   depends_on = [
     var.crds_depends_on
   ]
-}
-
-data "utils_deep_merge_yaml" "crds_values" {
-  count = local.crds_enabled ? 1 : 0
-
-  input = compact([
-    local.crds_values,
-    var.crds_values
-  ])
 }
 
 output "crds" {
