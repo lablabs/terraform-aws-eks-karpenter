@@ -7,7 +7,7 @@ locals {
   )
 }
 
-# IAM policies are aligned with https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v1.8/getting-started/getting-started-with-karpenter/cloudformation.yaml.
+# IAM policies are aligned with https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v1.15/getting-started/getting-started-with-karpenter/cloudformation.yaml.
 #  Policies are split into multiple policies based on https://karpenter.sh/docs/reference/cloudformation/#controller-authorization due to managed policy length limit of 6,144 characters.
 data "aws_iam_policy_document" "node_lifecycle" {
   #checkov:skip=CKV_AWS_111: In the future, we may further lock down ec2:RunInstances by using tags in related resources.
@@ -194,6 +194,7 @@ data "aws_iam_policy_document" "node_lifecycle" {
 
     actions = [
       "ec2:TerminateInstances",
+      "ec2:RebootInstances",
       "ec2:DeleteLaunchTemplate",
     ]
 
